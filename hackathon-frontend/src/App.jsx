@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Home from './pages/Home'
+import LostItems from './pages/LostItems'
+import FoundItems from './pages/FoundItems'
+import ReportLost from './pages/ReportLost'
+import ReportFound from './pages/ReportFound'
 
-function App() {
-  const [status, setStatus] = useState('Connecting...')
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/items/lost')
-      .then(res => res.json())
-      .then(data => setStatus(' Backend connected. Items: ' + data.items.length))
-      .catch(() => setStatus(' Cannot reach backend.'))
-  }, [])
-
+export default function App() {
   return (
-    <div style={{ padding: '40px', fontFamily: 'Arial' }}>
-      <h1>CampusFind</h1>
-      <p>{status}</p>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/lost" element={<LostItems />} />
+        <Route path="/found" element={<FoundItems />} />
+        <Route path="/report-lost" element={<ReportLost />} />
+        <Route path="/report-found" element={<ReportFound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
-
-export default App

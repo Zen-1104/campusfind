@@ -1,0 +1,127 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  height: 64px;
+  background-color: rgba(8, 14, 14, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(13, 148, 136, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.navbar-brand span {
+  color: #0d9488;
+}
+
+.navbar-brand .brand-icon {
+  color: #0d9488;
+  font-size: 1.3rem;
+}
+
+.navbar-center {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 4px 6px;
+  gap: 4px;
+}
+
+.navbar-center a {
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 6px 18px;
+  border-radius: 999px;
+  transition: all 0.2s;
+}
+
+.navbar-center a:hover {
+  color: #ffffff;
+}
+
+.navbar-center a.active {
+  background: rgba(13, 148, 136, 0.2);
+  color: #2dd4bf;
+  border-bottom: 2px solid #0d9488;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-btn {
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: #9ca3af;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.theme-btn:hover {
+  border-color: #0d9488;
+  color: #fff;
+}
+
+.btn-login {
+  background: transparent;
+  border: 1px solid #2a3a3a;
+  color: #ccc;
+  padding: 8px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-login:hover {
+  border-color: #0d9488;
+  color: #fff;
+}
+
+.btn-signup {
+  background: #0d9488;
+  border: none;
+  color: #fff;
+  padding: 8px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-signup:hover {
+  background: #0f766e;
+}
+
+@media (max-width: 768px) {
+  .navbar-center { display: none; }
+  .navbar { padding: 0 20px; }
+  .theme-btn { display: none; }
+}
