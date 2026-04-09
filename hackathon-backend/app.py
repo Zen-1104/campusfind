@@ -55,18 +55,26 @@ GOOGLE_CLIENT_ID = "84644656189-6q67uk9u76gu3qihn3mu2qhhviho89qd.apps.googleuser
 
 @app.route('/api/auth/google', methods=['POST'])
 def google_auth():
-    token = request.get_json().get('token')
+    data = request.get_json()
+    token = data.get('token')
     try:
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
-        email, name, google_id = idinfo['email'], idinfo.get('name', 'Student'), idinfo['sub']
+        email = idinfo['email']
+        name = idinfo.get('name', 'Student')
+        google_id = idinfo['sub']
+
         user = User.query.filter_by(email=email).first()
         if not user:
             user = User(name=name, email=email, google_oauth_id=google_id)
             db.session.add(user)
             db.session.commit()
-        return jsonify({'token': create_access_token(identity=str(user.id)), 'user': user.to_dict()}), 200
-    except:
-        return jsonify({'error': 'Invalid token'}), 401
+
+        access_token = create_access_token(identity=str(user.id))
+        return jsonify({'token': access_token, 'user': user.to_dict()}), 200
+
+    except Exception as e:
+        print(f"AUTH ERROR: {str(e)}")
+        return jsonify({'error': str(e)}), 401
 
 # --- Items ---
 @app.route('/api/items/lost', methods=['POST'])
