@@ -2,11 +2,21 @@ import { useState } from 'react'
 import { reportLostItem } from '../api'
 import './Form.css'
 
+const CAMPUS_LOCATIONS = {
+  "Academic Blocks": ["Block A", "Block B", "Block C", "Block D", "Block E", "Block F", "Block G", "Block H", "Block I", "Block J", "Block K"],
+  "Canteens": ["Anti-clock", "Clockwise", "Container", "Main Mess Hall"],
+  "General Campus": ["Library", "Main Auditorium", "Sports Ground", "Parking Lot", "Hostel / Dorms", "Campus Walkways"]
+};
+
 export default function ReportLost() {
   const [form, setForm] = useState({
-    title: '', description: '', category: '',
-    location: '', date_lost: '', contact: ''
+    title: '', description: '', category: '', date_lost: '', contact: ''
   })
+  
+  const [areaType, setAreaType] = useState('');
+  const [specificLocation, setSpecificLocation] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
+
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -17,10 +27,21 @@ export default function ReportLost() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+
+    let finalLocation = `${areaType} -> ${specificLocation}`;
+    if (areaType === "Academic Blocks" && roomNumber) {
+        finalLocation += ` -> Class/Room ${roomNumber}`;
+    }
+
+    const payload = { ...form, location: finalLocation };
+
     try {
-      await reportLostItem(form)
+      await reportLostItem(payload)
       setStatus('success')
-      setForm({ title: '', description: '', category: '', location: '', date_lost: '', contact: '' })
+      setForm({ title: '', description: '', category: '', date_lost: '', contact: '' })
+      setAreaType('')
+      setSpecificLocation('')
+      setRoomNumber('')
     } catch {
       setStatus('error')
     }
@@ -45,28 +66,79 @@ export default function ReportLost() {
           <label>Item Title</label>
           <input name="title" placeholder="e.g. Black Dell Laptop" value={form.title} onChange={handleChange} required />
         </div>
+        
         <div className="form-group">
           <label>Description</label>
           <textarea name="description" placeholder="Describe the item in detail..." value={form.description} onChange={handleChange} required />
         </div>
+
         <div className="form-row">
           <div className="form-group">
             <label>Category</label>
-            <input name="category" placeholder="e.g. Electronics, ID Card" value={form.category} onChange={handleChange} />
+            <select name="category" value={form.category} onChange={handleChange} required>
+              <option value="" disabled>Select a category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="ID Card / Documents">ID Card / Documents</option>
+              <option value="Wallet / Purse">Wallet / Purse</option>
+              <option value="Keys">Keys</option>
+              <option value="Bag / Backpack">Bag / Backpack</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Books / Stationery">Books / Stationery</option>
+              <option value="Water Bottle">Water Bottle</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
           <div className="form-group">
             <label>Date Lost</label>
             <input name="date_lost" type="date" value={form.date_lost} onChange={handleChange} required />
           </div>
         </div>
-        <div className="form-group">
-          <label>Last Seen Location</label>
-          <input name="location" placeholder="e.g. Library 2nd Floor" value={form.location} onChange={handleChange} required />
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Area Type</label>
+            <select value={areaType} onChange={(e) => {
+                setAreaType(e.target.value);
+                setSpecificLocation('');
+                setRoomNumber('');
+            }} required>
+              <option value="" disabled>Select Area Type</option>
+              {Object.keys(CAMPUS_LOCATIONS).map(area => (
+                <option key={area} value={area}>{area}</option>
+              ))}
+            </select>
+          </div>
+
+          {areaType && (
+            <div className="form-group cascading-reveal">
+              <label>Specific Location</label>
+              <select value={specificLocation} onChange={(e) => setSpecificLocation(e.target.value)} required>
+                <option value="" disabled>Select Specific Area</option>
+                {CAMPUS_LOCATIONS[areaType].map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
+
+        {areaType === "Academic Blocks" && specificLocation && (
+          <div className="form-group cascading-reveal">
+            <label>Class / Room Number (Optional)</label>
+            <input 
+              type="text" 
+              placeholder="e.g. 15, 3, or Lab 2" 
+              value={roomNumber} 
+              onChange={(e) => setRoomNumber(e.target.value)} 
+            />
+          </div>
+        )}
+
         <div className="form-group">
           <label>Your Contact</label>
           <input name="contact" placeholder="Email or phone number" value={form.contact} onChange={handleChange} required />
         </div>
+        
         <button type="submit" className="submit-btn lost-btn" disabled={loading}>
           {loading ? 'Submitting...' : '🔴 Report Lost Item'}
         </button>

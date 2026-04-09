@@ -11,13 +11,11 @@ app = Flask(__name__)
 
 CORS(app, origins="*")
 
-# Configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///campusfind.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'campusfind-secret-change-in-production'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
-# Upload config
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -29,15 +27,22 @@ def allowed_file(filename):
 db  = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-# ================= MODELS =================
+class Institution(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    type = db.Column(db.String(50))
+    verification_threshold = db.Column(db.Integer, default=500)
+    admin_ids = db.Column(db.String(255))
 
 class User(db.Model):
-    id            = db.Column(db.Integer, primary_key=True)
-    name          = db.Column(db.String(150), nullable=False)
-    email         = db.Column(db.String(150), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
-    role          = db.Column(db.String(20), default='student')
-    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default='student')
+    institution_id = db.Column(db.Integer, db.ForeignKey('institution.id'), nullable=True)
+    google_oauth_id = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -46,20 +51,27 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'email': self.email, 'role': self.role}
-
+        return {
+            'id': self.id, 
+            'name': self.name, 
+            'email': self.email, 
+            'role': self.role,
+            'institution_id': self.institution_id
+        }
 
 class LostItem(db.Model):
-    id          = db.Column(db.Integer, primary_key=True)
-    user_id     = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    title       = db.Column(db.String(200), nullable=False)
-    category    = db.Column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100))
     description = db.Column(db.Text)
-    location    = db.Column(db.String(200))
-    date_lost   = db.Column(db.String(50))
-    contact     = db.Column(db.String(200))
-    status      = db.Column(db.String(50), default='submitted')
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    location = db.Column(db.String(200))
+    approximate_value = db.Column(db.Integer, nullable=True)
+    date_lost = db.Column(db.String(50))
+    contact = db.Column(db.String(200))
+    status = db.Column(db.String(50), default='submitted')
+    photos = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='lost_items')
 
@@ -71,23 +83,26 @@ class LostItem(db.Model):
             'category': self.category,
             'description': self.description,
             'location': self.location,
+            'approximate_value': self.approximate_value,
             'date_lost': self.date_lost,
             'contact': self.contact,
             'status': self.status,
+            'photos': self.photos,
             'created_at': self.created_at.isoformat(),
         }
 
-
 class FoundItem(db.Model):
-    id           = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     submitted_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    title        = db.Column(db.String(200), nullable=False)
-    category     = db.Column(db.String(100))
-    description  = db.Column(db.Text)
-    location     = db.Column(db.String(200))
-    date_found   = db.Column(db.String(50))
-    status       = db.Column(db.String(50), default='submitted')
-    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    location_found = db.Column(db.String(200))
+    date_found = db.Column(db.String(50))
+    status = db.Column(db.String(50), default='submitted')
+    photos = db.Column(db.Text, nullable=True)
+    qr_code = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
         return {
@@ -96,14 +111,29 @@ class FoundItem(db.Model):
             'title': self.title,
             'category': self.category,
             'description': self.description,
-            'location': self.location,
+            'location_found': self.location_found,
             'date_found': self.date_found,
             'status': self.status,
+            'photos': self.photos,
+            'qr_code': self.qr_code,
             'created_at': self.created_at.isoformat(),
         }
 
+class Match(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lost_item_id = db.Column(db.Integer, db.ForeignKey('lost_item.id'), nullable=False)
+    found_item_id = db.Column(db.Integer, db.ForeignKey('found_item.id'), nullable=False)
+    similarity_score = db.Column(db.Float, nullable=False)
+    notified_at = db.Column(db.DateTime, nullable=True)
 
-# ================= AUTH ROUTES =================
+class Claim(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lost_item_id = db.Column(db.Integer, db.ForeignKey('lost_item.id'), nullable=False)
+    found_item_id = db.Column(db.Integer, db.ForeignKey('found_item.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(50), default='submitted')
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
@@ -144,8 +174,6 @@ def get_me():
     return jsonify({'user': user.to_dict()}), 200
 
 
-# ================= LOST ITEMS =================
-
 @app.route('/api/items/lost', methods=['GET'])
 def get_lost_items():
     items = LostItem.query.order_by(LostItem.created_at.desc()).all()
@@ -176,8 +204,6 @@ def report_lost_item():
     return jsonify({'message': 'Lost item reported', 'item': item.to_dict()}), 201
 
 
-# ================= FOUND ITEMS =================
-
 @app.route('/api/items/found', methods=['GET'])
 def get_found_items():
     items = FoundItem.query.order_by(FoundItem.created_at.desc()).all()
@@ -206,7 +232,7 @@ def report_found_item():
         title=data['title'],
         category=data.get('category', ''),
         description=data.get('description', ''),
-        location=data.get('location', ''),
+        location_found=data.get('location_found', ''),
         date_found=data.get('date_found', ''),
     )
 
@@ -215,8 +241,6 @@ def report_found_item():
 
     return jsonify({'message': 'Found item reported', 'item': item.to_dict()}), 201
 
-
-# ================= ADMIN =================
 
 VALID_STATUSES = ['submitted', 'admin_reviewing', 'ready_for_pickup', 'collected', 'unclaimed']
 
@@ -255,8 +279,6 @@ def admin_dashboard():
     })
 
 
-# ================= UPLOADS =================
-
 @app.route('/api/items/<string:item_type>/<int:item_id>/photos', methods=['POST'])
 @jwt_required()
 def upload_photo(item_type, item_id):
@@ -273,7 +295,18 @@ def upload_photo(item_type, item_id):
 
     file.save(filepath)
 
-    return jsonify({'photo_url': f'/uploads/{filename}'}), 201
+    photo_url = f'/uploads/{filename}'
+
+    item = LostItem.query.get_or_404(item_id) if item_type == 'lost' else FoundItem.query.get_or_404(item_id)
+    
+    if item.photos:
+        item.photos += f",{photo_url}"
+    else:
+        item.photos = photo_url
+        
+    db.session.commit()
+
+    return jsonify({'photo_url': photo_url}), 201
 
 
 @app.route('/uploads/<path:filename>')
@@ -286,8 +319,6 @@ def get_photo(filename):
 
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-
-# ================= DEV =================
 
 @app.route('/api/dev/seed', methods=['POST'])
 def seed():
@@ -302,8 +333,6 @@ def seed():
 
     return jsonify({'email': 'admin@campus.com', 'password': 'admin123'})
 
-
-# ================= RUN =================
 
 if __name__ == '__main__':
     with app.app_context():
