@@ -4,3 +4,4 @@ Flask-CORS
 Flask-JWT-Extended
 Werkzeug
 gunicorn
+google-auth

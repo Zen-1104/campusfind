@@ -6,12 +6,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import os
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 app = Flask(__name__)
 
 CORS(app, origins="*")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///campusfind.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///campusfind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'campusfind-secret-change-in-production'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
@@ -134,38 +136,33 @@ class Claim(db.Model):
     status = db.Column(db.String(50), default='submitted')
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+GOOGLE_CLIENT_ID = "PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com"
 
-@app.route('/api/auth/register', methods=['POST'])
-def register():
+@app.route('/api/auth/google', methods=['POST'])
+def google_auth():
     data = request.get_json()
+    token = data.get('token')
 
-    if not data.get('name') or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Name, email, and password required'}), 400
+    try:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
+        
+        email = idinfo['email']
+        name = idinfo.get('name', 'Student')
+        google_id = idinfo['sub']
 
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({'error': 'Email already registered'}), 409
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            user = User(name=name, email=email, google_oauth_id=google_id, role='student')
+            db.session.add(user)
+            db.session.commit()
 
-    user = User(name=data['name'], email=data['email'])
-    user.set_password(data['password'])
+        access_token = create_access_token(identity=str(user.id))
+        
+        return jsonify({'token': access_token, 'user': user.to_dict()}), 200
 
-    db.session.add(user)
-    db.session.commit()
-
-    token = create_access_token(identity=str(user.id))
-    return jsonify({'token': token, 'user': user.to_dict()}), 201
-
-
-@app.route('/api/auth/login', methods=['POST'])
-def login():
-    data = request.get_json()
-
-    user = User.query.filter_by(email=data.get('email')).first()
-    if not user or not user.check_password(data.get('password', '')):
-        return jsonify({'error': 'Invalid email or password'}), 401
-
-    token = create_access_token(identity=str(user.id))
-    return jsonify({'token': token, 'user': user.to_dict()}), 200
-
+    except ValueError:
+        return jsonify({'error': 'Invalid Google token'}), 401
 
 @app.route('/api/auth/me', methods=['GET'])
 @jwt_required()
@@ -173,12 +170,10 @@ def get_me():
     user = User.query.get(int(get_jwt_identity()))
     return jsonify({'user': user.to_dict()}), 200
 
-
 @app.route('/api/items/lost', methods=['GET'])
 def get_lost_items():
     items = LostItem.query.order_by(LostItem.created_at.desc()).all()
     return jsonify({'items': [i.to_dict() for i in items]}), 200
-
 
 @app.route('/api/items/lost', methods=['POST'])
 @jwt_required()
@@ -203,12 +198,10 @@ def report_lost_item():
 
     return jsonify({'message': 'Lost item reported', 'item': item.to_dict()}), 201
 
-
 @app.route('/api/items/found', methods=['GET'])
 def get_found_items():
     items = FoundItem.query.order_by(FoundItem.created_at.desc()).all()
     return jsonify({'items': [i.to_dict() for i in items]}), 200
-
 
 @app.route('/api/items/found', methods=['POST'])
 def report_found_item():
@@ -241,7 +234,6 @@ def report_found_item():
 
     return jsonify({'message': 'Found item reported', 'item': item.to_dict()}), 201
 
-
 VALID_STATUSES = ['submitted', 'admin_reviewing', 'ready_for_pickup', 'collected', 'unclaimed']
 
 @app.route('/api/items/<string:item_type>/<int:item_id>/status', methods=['PATCH'])
@@ -264,7 +256,6 @@ def update_status(item_type, item_id):
 
     return jsonify({'message': 'Status updated'}), 200
 
-
 @app.route('/api/admin/dashboard', methods=['GET'])
 @jwt_required()
 def admin_dashboard():
@@ -277,7 +268,6 @@ def admin_dashboard():
         'lost_items': [i.to_dict() for i in LostItem.query.all()],
         'found_items': [i.to_dict() for i in FoundItem.query.all()],
     })
-
 
 @app.route('/api/items/<string:item_type>/<int:item_id>/photos', methods=['POST'])
 @jwt_required()
@@ -308,7 +298,6 @@ def upload_photo(item_type, item_id):
 
     return jsonify({'photo_url': photo_url}), 201
 
-
 @app.route('/uploads/<path:filename>')
 @jwt_required()
 def get_photo(filename):
@@ -318,7 +307,6 @@ def get_photo(filename):
         return jsonify({'error': 'Admin access required'}), 403
 
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
 
 @app.route('/api/dev/seed', methods=['POST'])
 def seed():
@@ -332,7 +320,6 @@ def seed():
     db.session.commit()
 
     return jsonify({'email': 'admin@campus.com', 'password': 'admin123'})
-
 
 if __name__ == '__main__':
     with app.app_context():
