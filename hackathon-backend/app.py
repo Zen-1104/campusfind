@@ -206,6 +206,11 @@ def seed():
     db.session.commit()
     return jsonify({'message': 'Admin created', 'email': 'admin@campus.com'}), 201
 
+@app.route('/api/dev/users', methods=['GET'])
+def get_all_users():
+    users = User.query.all()
+    return jsonify({'users': [u.to_dict() for u in users]}), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
