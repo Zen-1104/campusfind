@@ -1,4 +1,4 @@
-echo "flask
+flask
 flask-sqlalchemy
 flask-cors
 flask-jwt-extended
@@ -6,4 +6,4 @@ werkzeug
 gunicorn
 google-auth
 google-auth-oauthlib
-requests" > requirements.txt
+requests
