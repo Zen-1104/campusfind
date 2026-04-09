@@ -124,20 +124,20 @@
 }
 
 .hero-btn-lost {
-  background: #0d9488;
+  background: #dc2626;
   color: #fff;
 }
 
 .hero-btn-lost .hero-btn-icon { background: rgba(255,255,255,0.15); }
-.hero-btn-lost:hover { background: #0f766e; }
+.hero-btn-lost:hover { background: #b91c1c; }
 
 .hero-btn-found {
-  background: #92400e;
+  background: #16a34a;
   color: #fff;
 }
 
 .hero-btn-found .hero-btn-icon { background: rgba(255,255,255,0.15); }
-.hero-btn-found:hover { background: #78350f; }
+.hero-btn-found:hover { background: #15803d; }
 
 .hero-btn-label { font-weight: 700; font-size: 0.95rem; }
 .hero-btn-sub { font-size: 0.75rem; opacity: 0.75; }

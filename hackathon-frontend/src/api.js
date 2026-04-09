@@ -27,3 +27,8 @@ export async function reportFoundItem(data) {
   })
   return res.json()
 }
+// Get all lost items for the logged-in user
+export async function getMyLostItems(userId) {
+  const res = await fetch(`${BASE_URL}/api/items/lost?user_id=${userId}`)
+  return res.json()
+}

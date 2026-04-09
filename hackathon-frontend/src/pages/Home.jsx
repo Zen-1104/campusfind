@@ -11,17 +11,17 @@ export default function Home() {
         <div className="hero-bg" />
 
         <div className="hero-content">
-          <div className="hero-badge">💚 YOUR CAMPUS. YOUR COMMUNITY.</div>
-          <h1>Lost something<br />on <span>campus?</span></h1>
-          <p>We help you find it faster. Report lost items or help others by listing what you've found.</p>
+          <div className="hero-badge anim-fadeUp delay-1">💚 YOUR CAMPUS. YOUR COMMUNITY.</div>
+          <h1 className="anim-fadeUp delay-2">Lost something<br />on <span>campus?</span></h1>
+          <p className="anim-fadeUp delay-3">We help you find it faster. Report lost items or help others by listing what you've found.</p>
 
-          <div className="hero-search">
+          <div className="hero-search anim-fadeUp delay-4">
             <span className="search-icon">🔍</span>
             <input placeholder="Search lost items (e.g., laptop, wallet, keys...)" />
             <span className="search-shortcut">⌘K</span>
           </div>
 
-          <div className="hero-buttons">
+          <div className="hero-buttons anim-fadeUp delay-5">
             <button className="hero-btn hero-btn-lost" onClick={() => navigate('/report-lost')}>
               <div className="hero-btn-icon">📋</div>
               <div>
@@ -40,7 +40,7 @@ export default function Home() {
         </div>
 
         {/* Floating trust card */}
-        <div className="hero-float-trust">
+        <div className="hero-float-trust anim-slideRight delay-3">
           <div className="trust-icon">🛡️</div>
           <div>
             <div className="trust-title">Safe & Trusted</div>
@@ -51,28 +51,28 @@ export default function Home() {
 
       {/* ── Stats ── */}
       <section className="stats-section">
-        <div className="stat-item">
+        <div className="stat-item anim-fadeUp delay-1">
           <div className="stat-icon">📋</div>
           <div>
             <div className="stat-num">120+</div>
             <div className="stat-label">Items Recovered</div>
           </div>
         </div>
-        <div className="stat-item">
+        <div className="stat-item anim-fadeUp delay-2">
           <div className="stat-icon">👥</div>
           <div>
             <div className="stat-num">850+</div>
             <div className="stat-label">Happy Students</div>
           </div>
         </div>
-        <div className="stat-item">
+        <div className="stat-item anim-fadeUp delay-3">
           <div className="stat-icon">🛡️</div>
           <div>
             <div className="stat-num">98%</div>
             <div className="stat-label">Successful Returns</div>
           </div>
         </div>
-        <div className="stat-item">
+        <div className="stat-item anim-fadeUp delay-4">
           <div className="stat-icon">⏱️</div>
           <div>
             <div className="stat-num">2.5 Days</div>
@@ -83,7 +83,7 @@ export default function Home() {
 
       {/* ── Browse ── */}
       <section className="browse-section">
-        <div className="browse-header">
+        <div className="browse-header anim-fadeUp delay-1">
           <div>
             <h2>Browse Items</h2>
             <p>See what others are looking for or what's been found.</p>
@@ -92,7 +92,7 @@ export default function Home() {
         </div>
 
         <div className="browse-cards">
-          <div className="browse-card lost-card" onClick={() => navigate('/lost')}>
+          <div className="browse-card lost-card anim-slideLeft delay-2" onClick={() => navigate('/lost')}>
             <div>
               <div className="card-icon-box">🔍</div>
               <div className="browse-card-text">
@@ -107,7 +107,7 @@ export default function Home() {
             <div className="browse-card-img">🎒</div>
           </div>
 
-          <div className="browse-card found-card" onClick={() => navigate('/found')}>
+          <div className="browse-card found-card anim-slideRight delay-3" onClick={() => navigate('/found')}>
             <div>
               <div className="card-icon-box">📦</div>
               <div className="browse-card-text">
@@ -126,7 +126,7 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <footer className="site-footer">
-        <div className="footer-grid">
+        <div className="footer-grid anim-fadeUp delay-2">
           <div>
             <div className="footer-brand-name">🔍 Campus<span>Find</span></div>
             <p className="footer-desc">Bringing campus communities closer,<br />one item at a time.</p>

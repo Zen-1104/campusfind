@@ -28,19 +28,47 @@ export default function ReportFound() {
   }
 
   return (
-    <div className="form-page">
-      <h2 className="form-title">🟢 Report Found Item</h2>
-      {status === 'success' && <div className="alert success">Item reported successfully!</div>}
-      {status === 'error' && <div className="alert error">Something went wrong. Try again.</div>}
+    <div className="form-page form-found">
+      <div className="form-header found-header">
+        <div className="form-header-icon">🟢</div>
+        <div>
+          <h2>Report Found Item</h2>
+          <p>Help return this item to its rightful owner</p>
+        </div>
+      </div>
+
+      {status === 'success' && <div className="alert success">✅ Item reported successfully!</div>}
+      {status === 'error' && <div className="alert error">❌ Something went wrong. Try again.</div>}
+
       <form className="form" onSubmit={handleSubmit}>
-        <input name="title" placeholder="Item Title" value={form.title} onChange={handleChange} required />
-        <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} required />
-        <input name="category" placeholder="Category (e.g. Electronics, ID Card)" value={form.category} onChange={handleChange} />
-        <input name="location" placeholder="Where did you find it?" value={form.location} onChange={handleChange} required />
-        <input name="date_found" type="date" value={form.date_found} onChange={handleChange} required />
-        <input name="contact" placeholder="Your contact (email/phone)" value={form.contact} onChange={handleChange} required />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Report Found Item'}
+        <div className="form-group">
+          <label>Item Title</label>
+          <input name="title" placeholder="e.g. Blue Water Bottle" value={form.title} onChange={handleChange} required />
+        </div>
+        <div className="form-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="Describe the item in detail..." value={form.description} onChange={handleChange} required />
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Category</label>
+            <input name="category" placeholder="e.g. Electronics, ID Card" value={form.category} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Date Found</label>
+            <input name="date_found" type="date" value={form.date_found} onChange={handleChange} required />
+          </div>
+        </div>
+        <div className="form-group">
+          <label>Where Did You Find It?</label>
+          <input name="location" placeholder="e.g. Canteen, Ground Floor" value={form.location} onChange={handleChange} required />
+        </div>
+        <div className="form-group">
+          <label>Your Contact</label>
+          <input name="contact" placeholder="Email or phone number" value={form.contact} onChange={handleChange} required />
+        </div>
+        <button type="submit" className="submit-btn found-btn" disabled={loading}>
+          {loading ? 'Submitting...' : '🟢 Report Found Item'}
         </button>
       </form>
     </div>

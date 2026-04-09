@@ -5,9 +5,17 @@
 }
 
 .page-title {
-  font-size: 1.8rem;
-  color: #ffffff;
-  margin-bottom: 28px;
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.grid {
+  animation: fadeUp 0.6s ease 0.2s forwards;
+  opacity: 0;
+}
+
+.empty {
+  animation: fadeUp 0.5s ease 0.2s forwards;
+  opacity: 0;
 }
 
 .grid {
