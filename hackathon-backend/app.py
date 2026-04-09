@@ -10,7 +10,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 app = Flask(__name__)
-CORS(app, origins="*")
+CORS(app, resources={r"/api/*": {"origins": ["https://campusfind-olive.vercel.app", "http://localhost:5173"]}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///campusfind.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
