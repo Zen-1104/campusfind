@@ -6,7 +6,6 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Hero ── */}
       <section className="hero-section">
         <div className="hero-bg" />
 
@@ -39,7 +38,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating trust card */}
         <div className="hero-float-trust anim-slideRight delay-3">
           <div className="trust-icon">🛡️</div>
           <div>
@@ -49,7 +47,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Stats ── */}
       <section className="stats-section">
         <div className="stat-item anim-fadeUp delay-1">
           <div className="stat-icon">📋</div>
@@ -81,7 +78,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Browse ── */}
       <section className="browse-section">
         <div className="browse-header anim-fadeUp delay-1">
           <div>
@@ -124,7 +120,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
       <footer className="site-footer">
         <div className="footer-grid anim-fadeUp delay-2">
           <div>
@@ -152,15 +147,6 @@ export default function Home() {
             <a href="#">Contact Us</a>
             <a href="#">Safety Tips</a>
             <a href="#">FAQ</a>
-          </div>
-
-          <div className="footer-col footer-newsletter">
-            <h4>Stay Updated</h4>
-            <p>Get tips and updates on lost & found items.</p>
-            <div className="newsletter-input">
-              <input placeholder="Enter your email" />
-              <button>→</button>
-            </div>
           </div>
         </div>
 

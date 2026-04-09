@@ -3,9 +3,9 @@ import { reportFoundItem } from '../api'
 import './Form.css'
 
 const CAMPUS_LOCATIONS = {
-  "Academic Blocks": ["Block A", "Block B", "Block C", "Block D", "Block E", "Block F", "Block G", "Block H", "Block I", "Block J", "Block K"],
-  "Canteens": ["Anti-clock", "Clockwise", "Container", "Main Mess Hall"],
-  "General Campus": ["Library", "Main Auditorium", "Sports Ground", "Parking Lot", "Hostel / Dorms", "Campus Walkways"]
+  "Academic Blocks": ["A Block", "B Block", "C Block", "D Block", "E Block", "F Block", "G Block", "H Block", "I Block", "J Block", "K Block"],
+  "Canteens": ["Anti-clock", "Clockwise", "Container", "Mess Hall"],
+  "General Campus": ["Basketball Court", "Ground", "Parking Lot", "Campus Walkways", "Other General Area"]
 };
 
 export default function ReportFound() {
@@ -79,12 +79,12 @@ export default function ReportFound() {
               <option value="" disabled>Select a category</option>
               <option value="Electronics">Electronics</option>
               <option value="ID Card / Documents">ID Card / Documents</option>
-              <option value="Wallet / Purse">Wallet / Purse</option>
+              <option value="Water Bottle">Water Bottle</option>
               <option value="Keys">Keys</option>
+              <option value="Wallet / Purse">Wallet / Purse</option>
               <option value="Bag / Backpack">Bag / Backpack</option>
               <option value="Clothing">Clothing</option>
               <option value="Books / Stationery">Books / Stationery</option>
-              <option value="Water Bottle">Water Bottle</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -127,7 +127,7 @@ export default function ReportFound() {
             <label>Class / Room Number (Optional)</label>
             <input 
               type="text" 
-              placeholder="e.g. 15, 3, or Lab 2" 
+              placeholder="e.g. D2, Auditorium, Lab, etc." 
               value={roomNumber} 
               onChange={(e) => setRoomNumber(e.target.value)} 
             />
