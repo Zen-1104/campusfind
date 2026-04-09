@@ -22,6 +22,19 @@ export const googleLogin = async (googleToken) => {
   return res.json();
 };
 
+// These names now match your page imports exactly
+export const getLostItems = async () => {
+  const res = await fetch(`${BASE_URL}/items/lost`);
+  if (!res.ok) throw new Error('Failed to fetch lost items');
+  return res.json();
+};
+
+export const getFoundItems = async () => {
+  const res = await fetch(`${BASE_URL}/items/found`);
+  if (!res.ok) throw new Error('Failed to fetch found items');
+  return res.json();
+};
+
 export const reportLostItem = async (data) => {
   const res = await fetch(`${BASE_URL}/items/lost`, {
     method: 'POST',
@@ -39,15 +52,5 @@ export const reportFoundItem = async (data) => {
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error('Failed to report found item');
-  return res.json();
-};
-
-export const fetchLostItems = async () => {
-  const res = await fetch(`${BASE_URL}/items/lost`);
-  return res.json();
-};
-
-export const fetchFoundItems = async () => {
-  const res = await fetch(`${BASE_URL}/items/found`);
   return res.json();
 };
