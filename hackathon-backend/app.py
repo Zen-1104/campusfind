@@ -51,7 +51,7 @@ class FoundItem(db.Model):
     status = db.Column(db.String(50), default='submitted')
 
 # --- Auth ---
-GOOGLE_CLIENT_ID = "YOUR_CLIENT_ID.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = "84644656189-6q67uk9u76gu3qihn3mu2qhhviho89qd.apps.googleusercontent.com"
 
 @app.route('/api/auth/google', methods=['POST'])
 def google_auth():
