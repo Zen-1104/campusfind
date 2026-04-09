@@ -21,18 +21,19 @@ export default function Home() {
           </div>
 
           <div className="hero-buttons anim-fadeUp delay-5">
-            <button className="hero-btn hero-btn-lost" onClick={() => navigate('/report-lost')}>
+            <button className="hero-btn hero-btn-lost" onClick={() => navigate('/auth')}>
               <div className="hero-btn-icon">📋</div>
               <div>
                 <div className="hero-btn-label">Report Lost Item</div>
-                <div className="hero-btn-sub">Let us help you find it</div>
+                <div className="hero-btn-sub">Verified students only</div>
               </div>
             </button>
+
             <button className="hero-btn hero-btn-found" onClick={() => navigate('/report-found')}>
               <div className="hero-btn-icon">📦</div>
               <div>
                 <div className="hero-btn-label">Report Found Item</div>
-                <div className="hero-btn-sub">Help return it to its owner</div>
+                <div className="hero-btn-sub">No login required</div>
               </div>
             </button>
           </div>
