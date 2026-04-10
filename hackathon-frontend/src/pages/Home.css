@@ -273,21 +273,21 @@
 .browse-card:hover { transform: translateY(-3px); }
 
 .browse-card.lost-card {
-  background: linear-gradient(135deg, #0a1f2e 0%, #0d3347 100%);
-  border: 1px solid rgba(13,148,136,0.25);
+  background: linear-gradient(135deg, #1c0906 0%, #28100a 100%);
+  border: 1px solid rgba(234, 88, 12, 0.15);
 }
 
 .browse-card.found-card {
-  background: linear-gradient(135deg, #1a1200 0%, #2d1f00 100%);
-  border: 1px solid rgba(180,130,20,0.25);
+  background: linear-gradient(135deg, #051a10 0%, #0a2717 100%);
+  border: 1px solid rgba(22, 163, 74, 0.15);
 }
 
 .browse-card-badge {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(13,148,136,0.2);
-  color: #2dd4bf;
+  background: rgba(234, 88, 12, 0.2);
+  color: #fdba74;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 10px;
@@ -295,14 +295,14 @@
 }
 
 .found-card .browse-card-badge {
-  background: rgba(180,130,20,0.2);
-  color: #fbbf24;
+  background: rgba(22, 163, 74, 0.2);
+  color: #86efac;
 }
 
 .card-icon-box {
   width: 48px;
   height: 48px;
-  background: rgba(13,148,136,0.15);
+  background: rgba(234, 88, 12, 0.15);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -312,7 +312,7 @@
 }
 
 .found-card .card-icon-box {
-  background: rgba(180,130,20,0.15);
+  background: rgba(22, 163, 74, 0.15);
 }
 
 .browse-card-text h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
@@ -333,21 +333,21 @@
   font-weight: 600;
   color: #ffffff;
   text-decoration: none;
-  background: rgba(13,148,136,0.2);
-  border: 1px solid rgba(13,148,136,0.3);
+  background: rgba(234, 88, 12, 0.2);
+  border: 1px solid rgba(234, 88, 12, 0.3);
   padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.2s;
 }
 
-.browse-card-link:hover { background: rgba(13,148,136,0.35); }
+.browse-card-link:hover { background: rgba(234, 88, 12, 0.35); }
 
 .found-card .browse-card-link {
-  background: rgba(180,130,20,0.2);
-  border-color: rgba(180,130,20,0.3);
+  background: rgba(22, 163, 74, 0.2);
+  border-color: rgba(22, 163, 74, 0.3);
 }
 
-.found-card .browse-card-link:hover { background: rgba(180,130,20,0.35); }
+.found-card .browse-card-link:hover { background: rgba(22, 163, 74, 0.35); }
 
 .browse-card-img {
   font-size: 5rem;

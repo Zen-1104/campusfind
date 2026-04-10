@@ -33,7 +33,7 @@ export default function ItemCard({ title, description, location, date, contact, 
         <div className="card-meta">
           <span>📍 {location}</span>
           <span>📅 {date}</span>
-          {contact && <span>📞 {contact}</span>}
+          {contact && <span><a href={`tel:${contact}`} style={{textDecoration: 'none', color: 'inherit'}}>{contact}</a></span>}
         </div>
       </div>
     </div>

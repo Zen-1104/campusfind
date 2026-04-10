@@ -1,47 +1,59 @@
-import { useState } from 'react';
+import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { googleLogin } from '../api';
-import './Form.css';
+import { loginGoogle } from '../api';
+import './Auth.css'; // Switch to the new dedicated CSS file
 
 export default function Auth() {
-  const [error, setError] = useState('');
-
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      setError('');
-      const data = await googleLogin(credentialResponse.credential);
-      
-      // Save data to storage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Force refresh to home to update all global states
-      window.location.href = '/';
+      const data = await loginGoogle(credentialResponse.credential);
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = "/";
+      }
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please try again.');
+      console.error("Login failed:", err);
     }
   };
 
   return (
-    <div className="form-page">
-      <div className="form-header">
-        <div className="form-header-icon">🎓</div>
-        <div>
-          <h2>Campus Access</h2>
-          <p>Sign in with your university Google account to report and track items.</p>
+    <div className="auth-page">
+      <div className="auth-glass-card">
+        <div className="auth-logo-icon" style={{ color: '#fff' }}>
+          <svg 
+            viewBox="0 0 24 24" 
+            width="1em" 
+            height="1em" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            fill="none" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="10" r="3"></circle>
+            <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
+          </svg>
         </div>
-      </div>
+        <h2>Student Verification</h2>
+        <p>To safely report or collect an item, please verify your campus identity.</p>
 
-      {error && <div className="alert error">❌ {error}</div>}
+        <div className="google-btn-container">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => alert('Login Failed')}
+            useOneTap
+            theme="outline"
+            shape="pill"
+            size="large"
+          />
+        </div>
 
-      <div className="form" style={{ alignItems: 'center', padding: '48px 24px' }}>
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => setError('Google login widget failed to load.')}
-          theme="filled_black"
-          shape="pill"
-          size="large"
-        />
+        <div className="auth-footer-text">
+          CampusFind restricts this feature to verified campus accounts to maintain a safe, trusted, and accountable community platform.
+        </div>
       </div>
     </div>
   );

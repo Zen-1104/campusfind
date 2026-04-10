@@ -4,6 +4,15 @@ import './Home.css'
 export default function Home() {
   const navigate = useNavigate()
 
+  const handleReportLostClick = () => {
+    // If logged in, go to the form. If not, go to auth page.
+    if (localStorage.getItem('token')) {
+      navigate('/report-lost');
+    } else {
+      navigate('/auth');
+    }
+  };
+
   return (
     <>
       <section className="hero-section">
@@ -21,7 +30,7 @@ export default function Home() {
           </div>
 
           <div className="hero-buttons anim-fadeUp delay-5">
-            <button className="hero-btn hero-btn-lost" onClick={() => navigate('/auth')}>
+            <button className="hero-btn hero-btn-lost" onClick={handleReportLostClick}>
               <div className="hero-btn-icon">📋</div>
               <div>
                 <div className="hero-btn-label">Report Lost Item</div>
@@ -85,7 +94,6 @@ export default function Home() {
             <h2>Browse Items</h2>
             <p>See what others are looking for or what's been found.</p>
           </div>
-          <button className="view-all-btn" onClick={() => navigate('/lost')}>View All Items →</button>
         </div>
 
         <div className="browse-cards">
