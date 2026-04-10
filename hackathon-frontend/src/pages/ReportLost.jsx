@@ -1,147 +1,81 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { reportLostItem } from '../api';
-import './Form.css';
-
-const CAMPUS_LOCATIONS = {
-  "Academic Blocks": ["A Block", "B Block", "C Block", "D Block", "E Block", "F Block", "G Block", "H Block", "I Block", "J Block", "K Block"],
-  "Canteens": ["Anti-clock", "Clockwise", "Container", "Mess Hall"],
-  "General Campus": ["Basketball Court", "Ground", "Parking Lot", "Campus Walkways", "Other General Area"]
-};
+import './Form.css'; // Reuses the same clean form styling
 
 export default function ReportLost() {
-  const [form, setForm] = useState({
-    title: '', description: '', category: '', date_lost: '', contact: ''
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'Electronics',
+    location: '',
+    date_lost: '',
+    contact: ''
   });
-  
-  const [areaType, setAreaType] = useState('');
-  const [specificLocation, setSpecificLocation] = useState('');
-  const [roomNumber, setRoomNumber] = useState('');
-
-  const [status, setStatus] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    let finalLocation = `${areaType} -> ${specificLocation}`;
-    if (areaType === "Academic Blocks" && roomNumber) {
-        finalLocation += ` -> Class/Room ${roomNumber}`;
-    }
-
-    const payload = { ...form, location: finalLocation };
-
+    setIsSubmitting(true);
     try {
-      await reportLostItem(payload);
-      setStatus('success');
-      setTimeout(() => navigate('/lost'), 1500);
-    } catch {
-      setStatus('error');
+      const res = await reportLostItem(formData);
+      if (res.id) {
+        alert('Lost item report posted! We will notify you if a match is found.');
+        navigate('/lost-gallery');
+      }
+    } catch (err) {
+      alert('Error posting report. Make sure you are logged in.');
+    } finally {
+      setIsSubmitting(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="form-page form-lost">
-      <div className="form-header lost-header">
-        <div className="form-header-icon">🔴</div>
-        <div>
-          <h2>Report Lost Item</h2>
-          <p>Provide details to help our community find your item.</p>
-        </div>
-      </div>
-
-      {status === 'success' && <div className="alert success">✅ Item reported successfully!</div>}
-      {status === 'error' && <div className="alert error">❌ Error reporting item. Are you logged in?</div>}
-
-      <form className="form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Item Title</label>
-          <input name="title" placeholder="e.g. Blue Water Bottle" value={form.title} onChange={handleChange} required />
-        </div>
-        
-        <div className="form-group">
-          <label>Description</label>
-          <textarea name="description" placeholder="Mention any unique marks, stickers, or brand name..." value={form.description} onChange={handleChange} required />
+    <div className="form-page-container">
+      <div className="form-card">
+        <div className="form-header">
+          <div className="form-icon-circle">🔍</div>
+          <h2>Report a Lost Item</h2>
+          <p>Provide details so the community can help you find it.</p>
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Category</label>
-            <select name="category" value={form.category} onChange={handleChange} required>
-              <option value="" disabled>Select a category</option>
-              <option value="Electronics">Electronics</option>
-              <option value="ID Card / Documents">ID Card / Documents</option>
-              <option value="Water Bottle">Water Bottle</option>
-              <option value="Keys">Keys</option>
-              <option value="Wallet / Purse">Wallet / Purse</option>
-              <option value="Bag / Backpack">Bag / Backpack</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Books / Stationery">Books / Stationery</option>
-              <option value="Other">Other</option>
-            </select>
+        <form onSubmit={handleSubmit} className="campus-form">
+          <div className="input-group">
+            <label>What did you lose?</label>
+            <input type="text" placeholder="e.g., Blue Water Bottle" required 
+              onChange={(e) => setFormData({...formData, title: e.target.value})} />
           </div>
-          <div className="form-group">
+
+          <div className="input-group">
+            <label>Where did you last see it?</label>
+            <input type="text" placeholder="e.g., Block C, Room 202" required 
+              onChange={(e) => setFormData({...formData, location: e.target.value})} />
+          </div>
+
+          <div className="input-group">
             <label>Date Lost</label>
-            <input name="date_lost" type="date" value={form.date_lost} onChange={handleChange} required />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label>Area Type (Last Seen)</label>
-            <select value={areaType} onChange={(e) => {
-                setAreaType(e.target.value);
-                setSpecificLocation('');
-                setRoomNumber('');
-            }} required>
-              <option value="" disabled>Select Area Type</option>
-              {Object.keys(CAMPUS_LOCATIONS).map(area => (
-                <option key={area} value={area}>{area}</option>
-              ))}
-            </select>
+            <input type="date" required 
+              onChange={(e) => setFormData({...formData, date_lost: e.target.value})} />
           </div>
 
-          {areaType && (
-            <div className="form-group cascading-reveal">
-              <label>Specific Location</label>
-              <select value={specificLocation} onChange={(e) => setSpecificLocation(e.target.value)} required>
-                <option value="" disabled>Select Specific Area</option>
-                {CAMPUS_LOCATIONS[areaType].map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-
-        {areaType === "Academic Blocks" && specificLocation && (
-          <div className="form-group cascading-reveal">
-            <label>Class / Room Number (Optional)</label>
-            <input 
-              type="text" 
-              placeholder="e.g. D2, Auditorium, Lab, etc." 
-              value={roomNumber} 
-              onChange={(e) => setRoomNumber(e.target.value)} 
-            />
+          <div className="input-group">
+            <label>Your Contact Info (Phone/Email)</label>
+            <input type="text" placeholder="How can the finder reach you?" required 
+              onChange={(e) => setFormData({...formData, contact: e.target.value})} />
           </div>
-        )}
 
-        <div className="form-group">
-          <label>Your Contact</label>
-          <input name="contact" placeholder="Email or phone number" value={form.contact} onChange={handleChange} required />
-        </div>
-        
-        <button type="submit" className="submit-btn lost-btn" disabled={loading}>
-          {loading ? 'Submitting...' : '🔴 Report Lost Item'}
-        </button>
-      </form>
+          <div className="input-group">
+            <label>Description</label>
+            <textarea placeholder="Any specific stickers, scratches, or brand names?"
+              onChange={(e) => setFormData({...formData, description: e.target.value})}></textarea>
+          </div>
+
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'Posting...' : 'Post Lost Report'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

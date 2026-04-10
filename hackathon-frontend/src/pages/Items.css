@@ -1,45 +1,145 @@
-.page {
-  max-width: 1100px;
+/* Container for the gallery pages */
+.items-page {
+  padding: 40px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 24px;
 }
 
-.page-title {
-  animation: fadeUp 0.5s ease forwards;
+.items-header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.grid {
-  animation: fadeUp 0.6s ease 0.2s forwards;
-  opacity: 0;
+.items-header h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  margin-bottom: 10px;
 }
 
-.empty {
-  animation: fadeUp 0.5s ease 0.2s forwards;
-  opacity: 0;
+.items-header p {
+  color: #64748b;
 }
 
-.grid {
+/* Responsive Grid System */
+.items-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 25px;
 }
 
-.status {
-  text-align: center;
-  padding: 60px;
-  color: #aaa;
-  font-size: 1rem;
-}
-
-.status.error {
-  color: #f87171;
-}
-
-.empty {
-  text-align: center;
-  padding: 60px;
-  color: #555;
-  font-size: 1rem;
-  border: 1px dashed #2a2a2a;
+/* Individual Item Card Styling */
+.item-card {
+  background: white;
   border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid #e2e8f0;
+}
+
+.item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge for current item status */
+.status-badge {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+.status-badge.submitted { background: #dcfce7; color: #166534; }
+.status-badge.at_security { background: #dbeafe; color: #1e40af; }
+.status-badge.collected { background: #f1f5f9; color: #475569; }
+
+.item-card h3 {
+  font-size: 1.25rem;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+/* Footer info for location and date */
+.card-footer {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.location {
+  font-weight: 600;
+  color: #475569;
+}
+
+/* Loading and Empty states */
+.loading-container, .no-items-message {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+/* Specific styling for Lost Item Cards */
+.item-card.lost-border {
+  border-top: 4px solid #f97316; /* Orange top border for Lost items */
+}
+
+.status-badge.lost {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+/* Contact information styling within the card */
+.contact-info {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed #fed7aa;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c2410c;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Optional: Animation for the 'LOST' badge to make it more visible */
+.status-badge.lost {
+  animation: pulse-soft 2s infinite;
+}
+
+@keyframes pulse-soft {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

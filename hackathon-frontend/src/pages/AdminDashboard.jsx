@@ -39,7 +39,7 @@ export default function AdminDashboard() {
       setData({ lost: res.lost || [], found: res.found || [] });
       setError(null);
     } catch {
-      setError('Access Denied or Failed to fetch data. Ensure you have admin privileges.');
+      setError('Access Denied or Failed to fetch data. Ensure you have admin privileges and your backend is running.');
     } finally {
       setLoading(false);
     }

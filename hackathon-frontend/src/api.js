@@ -10,18 +10,19 @@ export const loginGoogle = async (token) => {
     return res.json();
 };
 
-// --- Found Items (Providing both names to prevent crashes) ---
+// --- Fetching Items ---
 export const getLostItems = async () => {
     const res = await fetch(`${BASE_URL}/items/lost`);
     if (!res.ok) throw new Error('Failed to fetch lost items');
     return res.json();
 };
 
-export const fetchFoundItems = async () => {
+export const getFoundItems = async () => {
     const res = await fetch(`${BASE_URL}/items/found`);
+    if (!res.ok) throw new Error('Failed to fetch found items');
     return res.json();
 };
-export const getFoundItems = fetchFoundItems; 
+export const fetchFoundItems = getFoundItems;
 
 // --- Reporting ---
 export const reportLostItem = async (itemData) => {

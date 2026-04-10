@@ -34,7 +34,7 @@ function App() {
           <Route path="/found" element={<FoundItems />} />
           <Route path="/report-found" element={<ReportFound />} />
           
-          {/* About Page (Optional, can point to Home if not created) */}
+          {/* About Page */}
           <Route path="/about" element={<Home />} />
 
           {/* Protected Admin Route */}

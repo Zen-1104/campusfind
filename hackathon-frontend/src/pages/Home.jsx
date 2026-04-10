@@ -1,155 +1,166 @@
-import { useNavigate, Link } from 'react-router-dom'
-import './Home.css'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Home.css';
 
 export default function Home() {
-  const navigate = useNavigate()
-
-  const handleReportLostClick = () => {
-    // If logged in, go to the form. If not, go to auth page.
-    if (localStorage.getItem('token')) {
-      navigate('/report-lost');
-    } else {
-      navigate('/auth');
-    }
-  };
+  const navigate = useNavigate();
 
   return (
-    <>
+    <div className="home-page">
+      {/* ===== HERO SECTION ===== */}
       <section className="hero-section">
-        <div className="hero-bg" />
-
         <div className="hero-content">
-          <div className="hero-badge anim-fadeUp delay-1">💚 YOUR CAMPUS. YOUR COMMUNITY.</div>
-          <h1 className="anim-fadeUp delay-2">Lost something<br />on <span>campus?</span></h1>
-          <p className="anim-fadeUp delay-3">We help you find it faster. Report lost items or help others by listing what you've found.</p>
+          <div className="hero-badge">💚 YOUR CAMPUS. YOUR COMMUNITY.</div>
+          <h1>
+            Lost something<br />on <span className="highlight">campus?</span>
+          </h1>
+          <p className="hero-desc">
+            We help you find it faster. Report lost items or<br />
+            help others by listing what you've found.
+          </p>
 
-          <div className="hero-search anim-fadeUp delay-4">
-            <span className="search-icon">🔍</span>
-            <input placeholder="Search lost items (e.g., laptop, wallet, keys...)" />
-            <span className="search-shortcut">⌘K</span>
+          {/* Search Bar */}
+          <div className="search-bar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Search lost items (e.g., laptop, wallet, keys...)" />
+            <button className="filter-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+            </button>
           </div>
 
-          <div className="hero-buttons anim-fadeUp delay-5">
-            <button className="hero-btn hero-btn-lost" onClick={handleReportLostClick}>
-              <div className="hero-btn-icon">📋</div>
+          {/* Action Cards */}
+          <div className="hero-actions">
+            <button className="action-card lost-action" onClick={() => navigate('/report-lost')}>
+              <div className="action-icon">📝</div>
               <div>
-                <div className="hero-btn-label">Report Lost Item</div>
-                <div className="hero-btn-sub">Verified students only</div>
+                <strong>Report Lost Item</strong>
+                <span>Let us help you find it</span>
               </div>
             </button>
-
-            <button className="hero-btn hero-btn-found" onClick={() => navigate('/report-found')}>
-              <div className="hero-btn-icon">📦</div>
+            <button className="action-card found-action" onClick={() => navigate('/report-found')}>
+              <div className="action-icon">📦</div>
               <div>
-                <div className="hero-btn-label">Report Found Item</div>
-                <div className="hero-btn-sub">No login required</div>
+                <strong>Report Found Item</strong>
+                <span>Help return it to its owner</span>
               </div>
             </button>
           </div>
         </div>
 
-        <div className="hero-float-trust anim-slideRight delay-3">
-          <div className="trust-icon">🛡️</div>
-          <div>
-            <div className="trust-title">Safe & Trusted</div>
-            <div className="trust-sub">Verified reports,<br />real people</div>
+        <div className="hero-image">
+          <img src="/images/hero-illustration.png" alt="Campus items illustration" />
+          {/* Trust Badge */}
+          <div className="trust-badge">
+            <div className="trust-icon">🛡️</div>
+            <div>
+              <strong>Safe & Trusted</strong>
+              <span>Verified reports, real people</span>
+            </div>
+          </div>
+          {/* Student Count */}
+          <div className="student-badge">
+            <div className="avatar-group">
+              <div className="avatar a1"></div>
+              <div className="avatar a2"></div>
+              <div className="avatar a3"></div>
+            </div>
+            <span>Join <strong>850+</strong><br />students</span>
           </div>
         </div>
       </section>
 
+      {/* ===== STATS SECTION ===== */}
       <section className="stats-section">
-        <div className="stat-item anim-fadeUp delay-1">
-          <div className="stat-icon">📋</div>
+        <div className="stat-item">
+          <div className="stat-icon green">📦</div>
           <div>
-            <div className="stat-num">120+</div>
-            <div className="stat-label">Items Recovered</div>
+            <h3>120+</h3>
+            <p>Items Recovered</p>
           </div>
         </div>
-        <div className="stat-item anim-fadeUp delay-2">
-          <div className="stat-icon">👥</div>
+        <div className="stat-item">
+          <div className="stat-icon blue">👥</div>
           <div>
-            <div className="stat-num">850+</div>
-            <div className="stat-label">Happy Students</div>
+            <h3>850+</h3>
+            <p>Happy Students</p>
           </div>
         </div>
-        <div className="stat-item anim-fadeUp delay-3">
-          <div className="stat-icon">🛡️</div>
+        <div className="stat-item">
+          <div className="stat-icon teal">✅</div>
           <div>
-            <div className="stat-num">98%</div>
-            <div className="stat-label">Successful Returns</div>
+            <h3>98%</h3>
+            <p>Successful Returns</p>
           </div>
         </div>
-        <div className="stat-item anim-fadeUp delay-4">
-          <div className="stat-icon">⏱️</div>
+        <div className="stat-item">
+          <div className="stat-icon purple">⏱️</div>
           <div>
-            <div className="stat-num">2.5 Days</div>
-            <div className="stat-label">Avg. Return Time</div>
+            <h3>2.5 Days</h3>
+            <p>Avg. Return Time</p>
           </div>
         </div>
       </section>
 
+      {/* ===== BROWSE SECTION ===== */}
       <section className="browse-section">
-        <div className="browse-header anim-fadeUp delay-1">
+        <div className="browse-header">
           <div>
             <h2>Browse Items</h2>
             <p>See what others are looking for or what's been found.</p>
           </div>
+          <button className="btn-view-all" onClick={() => navigate('/found')}>View All Items →</button>
         </div>
 
         <div className="browse-cards">
-          <div className="browse-card lost-card anim-slideLeft delay-2" onClick={() => navigate('/lost')}>
-            <div>
-              <div className="card-icon-box">🔍</div>
-              <div className="browse-card-text">
-                <h3>Lost Items</h3>
-                <p>Find items others have reported as lost on campus.</p>
-                <Link to="/lost" className="browse-card-link" onClick={e => e.stopPropagation()}>
-                  View Lost Items →
-                </Link>
-              </div>
+          <div className="browse-card" onClick={() => navigate('/lost')}>
+            <div className="browse-card-content">
+              <div className="browse-card-icon">🔍</div>
+              <h3>Lost Items</h3>
+              <p>Find items others have reported as lost on campus.</p>
+              <button className="browse-card-btn">View Lost Items →</button>
             </div>
             <div className="browse-card-badge">56 New</div>
-            <div className="browse-card-img">🎒</div>
+            <img src="/images/lost-items-card.png" alt="Lost items" className="browse-card-img" />
           </div>
 
-          <div className="browse-card found-card anim-slideRight delay-3" onClick={() => navigate('/found')}>
-            <div>
-              <div className="card-icon-box">📦</div>
-              <div className="browse-card-text">
-                <h3>Found Items</h3>
-                <p>Browse items that have been found and turned in.</p>
-                <Link to="/found" className="browse-card-link" onClick={e => e.stopPropagation()}>
-                  View Found Items →
-                </Link>
-              </div>
+          <div className="browse-card found" onClick={() => navigate('/found')}>
+            <div className="browse-card-content">
+              <div className="browse-card-icon">📦</div>
+              <h3>Found Items</h3>
+              <p>Browse items that have been found and turned in.</p>
+              <button className="browse-card-btn">View Found Items →</button>
             </div>
-            <div className="browse-card-badge">34 New</div>
-            <div className="browse-card-img">📦</div>
+            <div className="browse-card-badge found-badge">34 New</div>
+            <img src="/images/found-items-card.png" alt="Found items" className="browse-card-img" />
           </div>
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="footer-grid anim-fadeUp delay-2">
-          <div>
-            <div className="footer-brand-name">🔍 Campus<span>Find</span></div>
-            <p className="footer-desc">Bringing campus communities closer,<br />one item at a time.</p>
-            <div className="footer-socials">
-              <a className="social-btn" href="#">📸</a>
-              <a className="social-btn" href="#">💬</a>
-              <a className="social-btn" href="#">✉️</a>
-              <a className="social-btn" href="#">🐦</a>
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <h3>🔍 CampusFind</h3>
+            <p>Bringing campus communities closer, one item at a time.</p>
+            <div className="social-icons">
+              <span>📷</span>
+              <span>💬</span>
+              <span>✉️</span>
+              <span>🐦</span>
             </div>
           </div>
-
           <div className="footer-col">
             <h4>Quick Links</h4>
-            <Link to="/">Home</Link>
-            <Link to="/lost">Lost Items</Link>
-            <Link to="/found">Found Items</Link>
-            <Link to="/report-lost">Report an Item</Link>
+            <a href="/">Home</a>
+            <a href="/lost">Lost Items</a>
+            <a href="/found">Found Items</a>
+            <a href="/report-found">Report an Item</a>
           </div>
-
           <div className="footer-col">
             <h4>Support</h4>
             <a href="#">Help Center</a>
@@ -157,16 +168,23 @@ export default function Home() {
             <a href="#">Safety Tips</a>
             <a href="#">FAQ</a>
           </div>
+          <div className="footer-col">
+            <h4>Stay Updated</h4>
+            <p>Get tips and updates on lost & found items.</p>
+            <div className="email-input">
+              <input type="email" placeholder="Enter your email" />
+              <button>→</button>
+            </div>
+          </div>
         </div>
-
         <div className="footer-bottom">
           <span>© 2024 CampusFind. All rights reserved.</span>
-          <div>
+          <div className="footer-links">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
           </div>
         </div>
       </footer>
-    </>
-  )
+    </div>
+  );
 }

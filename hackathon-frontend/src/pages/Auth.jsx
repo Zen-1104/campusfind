@@ -1,7 +1,7 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { loginGoogle } from '../api';
-import './Auth.css'; // Switch to the new dedicated CSS file
+import './Auth.css';
 
 export default function Auth() {
   const handleGoogleSuccess = async (credentialResponse) => {
