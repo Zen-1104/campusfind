@@ -7,6 +7,8 @@ import Auth from './pages/Auth';
 import LostItems from './pages/LostItems';
 import ReportLost from './pages/ReportLost';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminSignup from './pages/AdminSignup';
+import ClaimedDetails from './pages/ClaimedDetails';
 import './App.css';
 
 // AdminRoute: Protects the dashboard from regular students
@@ -37,10 +39,20 @@ function App() {
           {/* About Page */}
           <Route path="/about" element={<Home />} />
 
-          {/* Protected Admin Route */}
+          {/* Protected Admin Routes */}
           <Route path="/admin" element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          } />
+          <Route path="/admin-signup" element={
+            <AdminRoute>
+              <AdminSignup />
+            </AdminRoute>
+          } />
+          <Route path="/claimed" element={
+            <AdminRoute>
+              <ClaimedDetails />
             </AdminRoute>
           } />
 

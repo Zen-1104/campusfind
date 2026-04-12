@@ -1,23 +1,39 @@
-/* Container to center the form on the page with a subtle campus-themed background */
+/* Form Container ensuring height and alignment */
 .form-page-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px 20px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  padding: 80px 20px;
   min-height: calc(100vh - 70px);
+  background: #080c14;
 }
 
-/* The main white card containing the form */
+/* Glassmorphism Form Card */
 .form-card {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
-              0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   width: 100%;
   max-width: 550px;
-  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Header section styling */
@@ -29,27 +45,30 @@
 .form-icon-circle {
   width: 64px;
   height: 64px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   margin: 0 auto 15px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.1);
 }
 
 .form-header h2 {
-  color: #1e293b;
+  color: #ffffff;
   font-size: 1.75rem;
   margin-bottom: 8px;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .form-header p {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* Form Layout */
@@ -66,10 +85,10 @@
 }
 
 .input-group label {
-  font-weight: 600;
-  color: #334155;
+  font-weight: 500;
+  color: #cbd5e1;
   font-size: 0.9rem;
-  margin-left: 2px;
+  margin-left: 4px;
 }
 
 /* Input, Select, and Textarea styling */
@@ -77,22 +96,28 @@
 .input-group select, 
 .input-group textarea {
   width: 100%;
-  padding: 12px 16px;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 1rem;
-  color: #1e293b;
-  background-color: #ffffff;
-  transition: all 0.2s ease-in-out;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.04);
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+  color: #475569;
 }
 
 .input-group input:focus, 
 .input-group select:focus, 
 .input-group textarea:focus {
   outline: none;
-  border-color: #2563eb;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  border-color: rgba(45, 212, 191, 0.5);
+  background-color: transparent;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.08);
 }
 
 .input-group textarea {
@@ -105,32 +130,47 @@
 .input-group select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
+  background-position: right 14px center;
   background-size: 16px;
+}
+
+.input-group select option {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+/* Firefox date picker icon fix */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.6;
 }
 
 /* The Submit Button */
 .submit-btn {
   width: 100%;
   padding: 14px;
-  margin-top: 15px;
+  margin-top: 10px;
   border: none;
   border-radius: 12px;
-  background: #2563eb;
+  background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 100%);
   color: #ffffff;
-  font-weight: 700;
-  font-size: 1.05rem;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .submit-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.4);
 }
 
 .submit-btn:active {
@@ -138,25 +178,42 @@
 }
 
 .submit-btn:disabled {
-  background: #94a3b8;
+  background: #334155;
+  color: #64748b;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-/* Orange theme for the Lost Report form icon */
+/* Different theme for the "Lost" icon if desired, though teal looks great universally. */
 .form-page-container:has(.btn-lost-submit) .form-icon-circle {
-  background: #fff7ed;
-  color: #f97316;
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.2);
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .form-card {
     padding: 25px 20px;
-    border-radius: 16px;
+    border-radius: 20px;
   }
   
   .form-header h2 {
     font-size: 1.5rem;
   }
+  
+  .form-page-container {
+    padding: 30px 15px;
+  }
+}
+
+/* Fix browser autofill applying a white background */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover, 
+.input-group input:-webkit-autofill:focus, 
+.input-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #0b111a inset !important;
+  -webkit-text-fill-color: #ffffff !important;
 }

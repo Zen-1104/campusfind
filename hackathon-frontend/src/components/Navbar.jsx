@@ -31,14 +31,19 @@ export default function Navbar() {
           <Link to="/" className={path === '/' ? 'active' : ''}>Home</Link>
           <Link to="/lost" className={path === '/lost' ? 'active' : ''}>Lost Items</Link>
           <Link to="/found" className={path === '/found' ? 'active' : ''}>Found Items</Link>
-          <Link to="/report-found" className={path.startsWith('/report') ? 'active' : ''}>Report</Link>
           <Link to="/about" className={path === '/about' ? 'active' : ''}>About</Link>
+          {user && user.role === 'admin' && (
+            <>
+              <Link to="/admin" className={path === '/admin' ? 'active' : ''} style={{color: '#2dd4bf', fontWeight: 'bold'}}>Dashboard</Link>
+              <Link to="/claimed" className={path === '/claimed' ? 'active' : ''} style={{color: '#2dd4bf', fontWeight: 'bold'}}>Claimed Details</Link>
+            </>
+          )}
         </div>
       </div>
 
       <div className="navbar-right">
         {user && user.role === 'admin' && (
-          <Link to="/admin" className="admin-badge">🛡️</Link>
+          <Link to="/admin-signup" className="btn-signup" style={{marginRight: '10px'}}>Add Admin</Link>
         )}
         {user ? (
           <div className="user-profile">
@@ -47,8 +52,7 @@ export default function Navbar() {
           </div>
         ) : (
           <>
-            <button className="btn-login" onClick={() => navigate('/auth')}>Log In</button>
-            <button className="btn-signup" onClick={() => navigate('/auth')}>Sign Up</button>
+            <button className="btn-login" onClick={() => navigate('/auth')}>Admin Log In</button>
           </>
         )}
       </div>

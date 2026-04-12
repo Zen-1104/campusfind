@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/found?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <div className="home-page">
@@ -20,18 +28,24 @@ export default function Home() {
           </p>
 
           {/* Search Bar */}
-          <div className="search-bar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+          <form className="search-bar" onSubmit={handleSearch}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" style={{marginLeft: '15px'}}>
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Search lost items (e.g., laptop, wallet, keys...)" />
-            <button className="filter-icon">
+            <input 
+              type="text" 
+              placeholder="Search found items (e.g., laptop, wallet, keys...)" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="filter-icon" style={{border: 'none', background: 'transparent', cursor: 'pointer', paddingRight: '15px'}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
             </button>
-          </div>
+          </form>
 
           {/* Action Cards */}
           <div className="hero-actions">
@@ -167,14 +181,6 @@ export default function Home() {
             <a href="#">Contact Us</a>
             <a href="#">Safety Tips</a>
             <a href="#">FAQ</a>
-          </div>
-          <div className="footer-col">
-            <h4>Stay Updated</h4>
-            <p>Get tips and updates on lost & found items.</p>
-            <div className="email-input">
-              <input type="email" placeholder="Enter your email" />
-              <button>→</button>
-            </div>
           </div>
         </div>
         <div className="footer-bottom">

@@ -11,7 +11,7 @@ export default function LostItems() {
   useEffect(() => {
     getLostItems()
       .then(data => {
-        setItems(data.items || [])
+        setItems(Array.isArray(data) ? data : (data.items || []))
         setLoading(false)
       })
       .catch(() => {
@@ -24,8 +24,12 @@ export default function LostItems() {
   if (error) return <div className="status error">{error}</div>
 
   return (
-    <div className="page">
-      <h2 className="page-title">🔴 Lost Items</h2>
+    <div className="gallery-page-wrapper">
+      <div className="items-page">
+        <div className="items-header">
+          <h2 className="page-title">🔴 Lost Items</h2>
+          <p>These items have been reported missing across the campus.</p>
+        </div>
       {items.length === 0 ? (
         <div className="empty">No lost items reported yet.</div>
       ) : (
@@ -42,6 +46,7 @@ export default function LostItems() {
           ))}
         </div>
       )}
+      </div>
     </div>
   )
 }

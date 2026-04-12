@@ -5,7 +5,7 @@ import App from './App';
 import './index.css'; // Global styles
 
 // The Google Client ID links your frontend to your Google Cloud Console project
-const GOOGLE_CLIENT_ID = "84644656189-6q67uk9u76gu3qihn3mu2qhhviho89qd.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "264145714129-1l9ak5osn77po04ms73kqhi46sl5psi7.apps.googleusercontent.com";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

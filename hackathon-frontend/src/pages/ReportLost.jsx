@@ -22,7 +22,7 @@ export default function ReportLost() {
       const res = await reportLostItem(formData);
       if (res.id) {
         alert('Lost item report posted! We will notify you if a match is found.');
-        navigate('/lost-gallery');
+        navigate('/lost');
       }
     } catch (err) {
       alert('Error posting report. Make sure you are logged in.');

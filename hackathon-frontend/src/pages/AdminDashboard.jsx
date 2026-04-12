@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAdminDashboard, updateItemStatus } from '../api';
+import { getAdminDashboard, updateItemStatus, deleteItem } from '../api';
 import './AdminDashboard.css';
 
 const STATUS_STEPS = ['submitted', 'verified', 'at_security', 'collected'];
@@ -24,6 +24,15 @@ export default function AdminDashboard() {
 
   const [foundCategory, setFoundCategory] = useState("All");
   const [lostCategory, setLostCategory] = useState("All");
+
+  const [showCollectModal, setShowCollectModal] = useState(false);
+  const [collectingItemId, setCollectingItemId] = useState(null);
+  const [collectorData, setCollectorData] = useState({
+    collector_name: '',
+    collector_phone: '',
+    collector_email: '',
+    collector_time: ''
+  });
 
   useEffect(() => {
     fetchData();
@@ -54,6 +63,38 @@ export default function AdminDashboard() {
     }
   };
 
+  const openCollectModal = (id) => {
+    setCollectingItemId(id);
+    const now = new Date();
+    // format as YYYY-MM-DDTHH:MM for datetime-local
+    // adding timezone offset manually since toISOString is strict UTC
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    setCollectorData({ collector_name: '', collector_phone: '', collector_email: '', collector_time: localDateTime });
+    setShowCollectModal(true);
+  };
+
+  const submitCollectModal = async (e) => {
+    e.preventDefault();
+    try {
+      await updateItemStatus(collectingItemId, 'collected', collectorData);
+      setShowCollectModal(false);
+      setCollectingItemId(null);
+      fetchData();
+    } catch {
+      alert('Failed to mark item as collected. Please try again.');
+    }
+  };
+
+  const handleDelete = async (type, id) => {
+    if (!window.confirm(`Are you sure you want to permanently delete this ${type} item?`)) return;
+    try {
+      await deleteItem(type, id);
+      fetchData();
+    } catch {
+      alert('Failed to delete item. Please try again.');
+    }
+  };
+
   if (loading) return <div className="admin-status">Loading Command Center...</div>;
   if (error) return <div className="admin-status error">{error}</div>;
 
@@ -61,8 +102,9 @@ export default function AdminDashboard() {
   const filteredLost = lostCategory === "All" ? data.lost : data.lost.filter(item => item.category === lostCategory);
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-header">
+    <div className="admin-page-wrapper">
+      <div className="admin-dashboard">
+        <div className="admin-header">
         <h2>🛡️ Security Command Center</h2>
         <p>Manage campus reports and verify found items.</p>
       </div>
@@ -110,10 +152,7 @@ export default function AdminDashboard() {
                     <button 
                       className="verify-btn"
                       style={{ background: '#f59e0b' }}
-                      onClick={async () => {
-                        await updateItemStatus(item.id, 'collected');
-                        fetchData();
-                      }}
+                      onClick={() => openCollectModal(item.id)}
                     >
                       🤝 Mark as Collected
                     </button>
@@ -121,6 +160,12 @@ export default function AdminDashboard() {
                   {item.status === 'collected' && (
                     <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓ Item Returned to Owner</span>
                   )}
+                  <button 
+                    className="delete-btn"
+                    onClick={() => handleDelete('found', item.id)}
+                  >
+                    🗑️ Delete Record
+                  </button>
                 </div>
               </div>
             ))}
@@ -148,12 +193,77 @@ export default function AdminDashboard() {
                       <a href={`tel:${item.contact}`} style={{textDecoration: 'none', color: 'inherit'}}>{item.contact}</a>
                     </span>
                   )}
+
+                  <div className="card-actions" style={{marginTop: '20px'}}>
+                    <button 
+                      className="delete-btn"
+                      onClick={() => handleDelete('lost', item.id)}
+                    >
+                      🗑️ Delete Report
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Collection Modal Overlay */}
+      {showCollectModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-form">
+            <h3>Record Claimant Details</h3>
+            <p className="modal-desc">Log the details of the person collecting this item to complete validation.</p>
+            <form onSubmit={submitCollectModal}>
+              <div className="form-group">
+                <label>Claimant Full Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={collectorData.collector_name}
+                  onChange={e => setCollectorData({...collectorData, collector_name: e.target.value})}
+                  placeholder="John Doe"
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input 
+                  type="tel" 
+                  required
+                  value={collectorData.collector_phone}
+                  onChange={e => setCollectorData({...collectorData, collector_phone: e.target.value})}
+                  placeholder="i.e. +1 555 123 4567"
+                />
+              </div>
+              <div className="form-group">
+                <label>College Email ID</label>
+                <input 
+                  type="email" 
+                  required
+                  value={collectorData.collector_email}
+                  onChange={e => setCollectorData({...collectorData, collector_email: e.target.value})}
+                  placeholder="jdoe@campus.edu"
+                />
+              </div>
+              <div className="form-group">
+                <label>Claimed Time</label>
+                <input 
+                  type="datetime-local" 
+                  required
+                  value={collectorData.collector_time}
+                  onChange={e => setCollectorData({...collectorData, collector_time: e.target.value})}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowCollectModal(false)}>Cancel</button>
+                <button type="submit" className="btn-submit">Confirm Handover</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }
