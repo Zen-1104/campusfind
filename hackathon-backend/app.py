@@ -14,8 +14,8 @@ from google.genai import types as genai_types
 
 # Initialize new Gemini client with short HTTP timeout to fail fast on quota errors
 gemini_client = google_genai.Client(
-    api_key="AIzaSyB0gopOQoBlcI18hj8sAd-fCtMeqx8M7MA",
-    http_options=genai_types.HttpOptions(timeout=8000)  # 8 second max per request
+    api_key=os.environ.get("GEMINI_API_KEY", ""),
+    http_options=genai_types.HttpOptions(timeout=8000)
 )
 
 app = Flask(__name__)
@@ -31,7 +31,8 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Enable CORS
-CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+CORS(app, resources={r"/api/*": { "origins": [ "http://localhost:5173", "http://localhost:3000", os.environ.get("FRONTEND_URL", "*") ], "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"] }})
+
 
 # Database Configuration (PostgreSQL for Render, SQLite for Local)
 db_uri = os.environ.get('DATABASE_URL', 'sqlite:///campusfind.db')
