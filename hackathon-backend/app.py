@@ -141,17 +141,19 @@ with app.app_context():
 # --- API Routes ---
 
 # Define allowed domain and admins
-ALLOWED_DOMAIN = '@karnavatiuniversity.edu.in' # <-- Replace with your actual university domain!
+ALLOWED_DOMAIN = '@karnavatiuniversity.edu.in'
 ADMIN_EMAILS = [
     'ku2507u0198@karnavatiuniversity.edu.in', # Primary admin
-    # Add more admin emails here:
-    # 'john.doe@college.edu',
-    # 'admin@college.edu'
+    'ku2507u0041@karnavatiuniversity.edu.in'
 ]
 
 @app.route('/api/auth/google', methods=['POST'])
 def google_auth():
-    token = request.json.get('token')
+    body = request.get_json(silent=True) or {}
+    token = body.get('token')
+    
+    if not token:
+        return jsonify({'error': 'No token provided'}), 400
     try:
         # Replace with your actual Google Client ID
         CLIENT_ID = "264145714129-1l9ak5osn77po04ms73kqhi46sl5psi7.apps.googleusercontent.com"
