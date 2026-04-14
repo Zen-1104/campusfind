@@ -13,6 +13,12 @@ export default function Auth() {
     try {
       setError('');
       setLoading(true);
+
+      if (!credentialResponse?.credential) {
+        setError('No credential received from Google. Please try again.');
+        return;
+      }
+
       const data = await loginGoogle(credentialResponse.credential);
 
       if (data.token) {
@@ -21,7 +27,7 @@ export default function Auth() {
         navigate('/');
         window.location.reload();
       } else {
-        setError('Google login failed. No token received.');
+        setError(data.error || 'Google login failed. No token received.');
       }
     } catch (err) {
       setError(err.message || 'Login failed. Please check your connection.');

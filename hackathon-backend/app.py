@@ -151,31 +151,28 @@ ADMIN_EMAILS = [
 def google_auth():
     body = request.get_json(silent=True) or {}
     token = body.get('token')
-    
+
     if not token:
         return jsonify({'error': 'No token provided'}), 400
+
     try:
-        # Replace with your actual Google Client ID
         CLIENT_ID = "264145714129-1l9ak5osn77po04ms73kqhi46sl5psi7.apps.googleusercontent.com"
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
         email = idinfo.get('email', '').lower()
 
-        # Check if user is allowed to log in
         is_admin = email in ADMIN_EMAILS
         is_student = email.endswith(ALLOWED_DOMAIN)
 
         if not (is_admin or is_student):
             return jsonify({'error': f'Unauthorized. Only {ALLOWED_DOMAIN} emails or registered admins are permitted.'}), 403
-        
+
         user = User.query.filter_by(email=email).first()
         if not user:
-            # Determine role based on which list/condition they matched
             role = 'admin' if is_admin else 'student'
             user = User(name=idinfo.get('name', 'User'), email=email, role=role)
             db.session.add(user)
             db.session.commit()
         else:
-            # Ensure their role is up-to-date in case they were added to the admin list later
             expected_role = 'admin' if is_admin else 'student'
             if user.role != expected_role:
                 user.role = expected_role
@@ -183,8 +180,11 @@ def google_auth():
 
         access_token = create_access_token(identity=str(user.id))
         return jsonify({'token': access_token, 'user': user.to_dict()}), 200
+
+    except ValueError as e:
+        return jsonify({'error': f'Invalid Google token: {str(e)}'}), 401
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': f'Login failed: {str(e)}'}), 400
 
 @app.route('/api/items/lost', methods=['GET', 'POST'])
 @jwt_required(optional=True)
