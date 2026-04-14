@@ -8,7 +8,9 @@ export const loginGoogle = async (token) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token })
     });
-    return res.json();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Google login failed');
+    return data;
 };
 
 export const adminLogin = async (email, password) => {
