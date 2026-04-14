@@ -1,0 +1,140 @@
+/* ============================================================
+   ADMIN ITEM PHOTO — shared component styles
+   ============================================================ */
+
+/* Wrapper */
+.aip-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: #0a0f1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 220px;
+  border: 1px solid rgba(45, 212, 191, 0.15);
+}
+
+/* Compact mode — smaller thumbnail for ItemCard */
+.aip-wrap.aip-compact {
+  max-height: 160px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* The photo itself */
+.aip-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.aip-wrap.aip-compact .aip-img {
+  max-height: 160px;
+}
+
+.aip-img:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+/* Shimmer loading skeleton */
+.aip-skeleton {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: aip-shimmer 1.4s infinite;
+  border-radius: 10px;
+}
+
+@keyframes aip-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Missing photo fallback text */
+.aip-missing {
+  padding: 20px;
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+/* "🔒 Admin only" badge */
+.aip-badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #94a3b8;
+  font-size: 0.68rem;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+.aip-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.93);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: zoom-out;
+  animation: aip-fade 0.18s ease;
+}
+
+@keyframes aip-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.aip-lightbox-img {
+  max-width: 92vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.aip-lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  pointer-events: all;
+}
+
+.aip-lightbox-close:hover {
+  background: rgba(239, 68, 68, 0.6);
+}

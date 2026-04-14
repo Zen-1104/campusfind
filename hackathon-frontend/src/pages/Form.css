@@ -217,3 +217,142 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   -webkit-box-shadow: 0 0 0 30px #0b111a inset !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+/* ============================================================
+   PHOTO UPLOAD ZONE
+   ============================================================ */
+.photo-upload-zone {
+  border: 2px dashed rgba(45, 212, 191, 0.3);
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(45, 212, 191, 0.03);
+  user-select: none;
+}
+
+.photo-upload-zone:hover,
+.photo-upload-zone.dragging {
+  border-color: rgba(45, 212, 191, 0.7);
+  background: rgba(45, 212, 191, 0.07);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(45, 212, 191, 0.1);
+}
+
+.photo-upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.photo-upload-title {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+.photo-upload-sub {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin: 0 0 14px;
+}
+
+.photo-upload-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.photo-btn-chip {
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  color: #2dd4bf;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* ============================================================
+   PHOTO PREVIEW
+   ============================================================ */
+.photo-preview-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  background: #0a0f1a;
+  max-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-preview-img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.photo-preview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  justify-content: flex-end;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+.photo-remove-btn,
+.photo-change-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.photo-remove-btn {
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+}
+
+.photo-remove-btn:hover {
+  background: #ef4444;
+}
+
+.photo-change-btn {
+  background: rgba(45, 212, 191, 0.85);
+  color: #0a0f1a;
+}
+
+.photo-change-btn:hover {
+  background: #2dd4bf;
+}
+
+.photo-lock-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.65);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+}

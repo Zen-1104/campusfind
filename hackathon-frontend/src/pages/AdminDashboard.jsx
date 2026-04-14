@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { getAdminDashboard, updateItemStatus, deleteItem } from '../api';
 import './AdminDashboard.css';
 
+const BACKEND = 'http://localhost:8080';
+
 const STATUS_STEPS = ['submitted', 'verified', 'at_security', 'collected'];
 
 const CATEGORIES = [
@@ -119,11 +121,28 @@ export default function AdminDashboard() {
         {filteredFound.length === 0 ? <p className="empty">No found items in this category.</p> : (
           <div className="admin-list">
             {filteredFound.map(item => (
-              <div key={item.id} className="admin-card">
-                <div className="card-info">
+                <div key={item.id} className="admin-card">
+                  {/* Item photo — publicly served */}
+                  {item.photo_url && (
+                    <div className="admin-item-photo-wrap">
+                      <img
+                        src={`${BACKEND}${item.photo_url}`}
+                        alt={item.title}
+                        className="admin-item-photo"
+                        onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="card-info">
                   <h4>{item.title}</h4>
                   <p>{item.description}</p>
                   <span className="location">📍 {item.location}</span>
+                  {item.reporter_phone && (
+                    <span className="reporter-phone" style={{ color: '#ffffff', display: 'block', marginTop: '8px', fontSize: '0.9rem' }}>
+                      📞 Reporter: <a href={`tel:${item.reporter_phone}`} style={{color: '#2dd4bf', textDecoration: 'none'}}>{item.reporter_phone}</a>
+                    </span>
+                  )}
                 </div>
                 
                 {/* Status Ticker UI */}

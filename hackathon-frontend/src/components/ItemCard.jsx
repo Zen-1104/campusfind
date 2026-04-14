@@ -1,41 +1,100 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ItemCard.css';
 
-export default function ItemCard({ title, description, location, status, date, contact, claimantName, claimantEmail, claimedTime }) {
-  // Map specific statuses to nice readable names
+const BACKEND = 'http://localhost:8080';
+
+export default function ItemCard({
+  title,
+  description,
+  location,
+  status,
+  date,
+  contact,
+  category,
+  photo_url,
+  claimantName,
+  claimantEmail,
+  claimedTime,
+  hideImage = false
+}) {
+  const [lightbox, setLightbox] = useState(false);
+
   const statusLabels = {
-    'submitted': '🟢 Just Found',
+    'submitted':  '🟢 Just Found',
     'at_security': '🛡️ At Security',
-    'collected': '✓ Returned',
-    'lost': '🔴 Missing'
+    'collected':  '✓ Returned',
+    'lost':       '🔴 Missing'
   };
 
   const displayStatus = statusLabels[status] || status || (date ? '🔴 Missing' : '🟢 Found');
 
   return (
-    <div className="card">
-      <div className="card-body">
-        <div className="card-tag">{displayStatus}</div>
-        <h3>{title}</h3>
-        <p className="card-description">{description}</p>
-        <div className="card-meta">
-          <span>📍 {location}</span>
-          {date && <span>📅 Date: {date.split('T')[0]}</span>}
-          {contact && (
-            <span>
-              📞 <a href={`tel:${contact}`} style={{textDecoration: 'none', color: 'inherit'}}>{contact}</a>
-            </span>
+    <>
+      <div className="card">
+        {/* Photo at the top of the card */}
+        {photo_url && (
+          <div className="card-photo-wrap" style={hideImage ? { cursor: 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}>
+            {hideImage ? (
+              <div style={{ color: '#475569', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '1.5rem' }}>🔒</span>
+                Cannot see the image
+              </div>
+            ) : (
+              <img
+                src={`${BACKEND}${photo_url}`}
+                alt={title}
+                className="card-photo"
+                onClick={() => setLightbox(true)}
+                title="Click to enlarge"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
+          </div>
+        )}
+
+        <div className="card-body">
+          <div className="card-tag">{displayStatus}</div>
+          <h3>{title}</h3>
+
+          {category && (
+            <span className="card-category">🏷️ {category}</span>
           )}
-          {claimantName && (
-            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)'}}>
-              <span style={{color: '#2dd4bf', fontWeight: 'bold'}}>CLAIMANT</span><br/>
-              <span style={{color: '#e2e8f0'}}>{claimantName}</span>
-              {claimantEmail && <span><br/>✉️ {claimantEmail}</span>}
-              {claimedTime && <span><br/>🕒 {new Date(claimedTime).toLocaleString()}</span>}
-            </div>
-          )}
+
+          <p className="card-description">{description}</p>
+
+          <div className="card-meta">
+            {location && <span>📍 {location}</span>}
+            {date    && <span>📅 {date.split('T')[0]}</span>}
+            {contact && (
+              <span>
+                📞 <a href={`tel:${contact}`} style={{ textDecoration: 'none', color: 'inherit' }}>{contact}</a>
+              </span>
+            )}
+
+            {claimantName && (
+              <div className="card-claimant">
+                <span className="claimant-label">CLAIMANT</span>
+                <span>{claimantName}</span>
+                {claimantEmail && <span>✉️ {claimantEmail}</span>}
+                {claimedTime   && <span>🕒 {new Date(claimedTime).toLocaleString()}</span>}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Lightbox Overlay */}
+      {lightbox && photo_url && (
+        <div className="ic-lightbox" onClick={() => setLightbox(false)}>
+          <img src={`${BACKEND}${photo_url}`} alt={title} className="ic-lightbox-img" />
+          <button
+            className="ic-lightbox-close"
+            onClick={(e) => { e.stopPropagation(); setLightbox(false); }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+    </>
   );
 }

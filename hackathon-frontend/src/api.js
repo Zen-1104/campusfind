@@ -65,19 +65,44 @@ export const reportLostItem = async (itemData) => {
     return res.json();
 };
 
-export const reportFoundItem = async (itemData) => {
-    const headers = { 'Content-Type': 'application/json' };
+export const reportFoundItem = async (itemData, photoFile = null) => {
     const token = localStorage.getItem('token');
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    const formData = new FormData();
+
+    // Append all text fields
+    Object.entries(itemData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) formData.append(key, value);
+    });
+
+    // Append the photo if provided
+    if (photoFile) {
+        formData.append('photo', photoFile);
     }
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    // Do NOT set Content-Type — browser sets it automatically with boundary for FormData
 
     const res = await fetch(`${BASE_URL}/items/found`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(itemData)
+        body: formData
     });
     return res.json();
+};
+
+export const scanItemUpload = async (photoFile) => {
+    const formData = new FormData();
+    formData.append('photo', photoFile);
+
+    const res = await fetch(`${BASE_URL}/scan_item`, {
+        method: 'POST',
+        body: formData
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to scan image');
+    return data;
 };
 
 // --- Admin ---

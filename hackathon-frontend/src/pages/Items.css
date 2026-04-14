@@ -68,3 +68,9 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Wrapper that stacks the admin photo on top of ItemCard */
+.found-item-card-wrap {
+  display: flex;
+  flex-direction: column;
+}

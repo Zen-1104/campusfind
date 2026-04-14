@@ -6,6 +6,7 @@ import ReportFound from './pages/ReportFound';
 import Auth from './pages/Auth';
 import LostItems from './pages/LostItems';
 import ReportLost from './pages/ReportLost';
+import About from './pages/About';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminSignup from './pages/AdminSignup';
 import ClaimedDetails from './pages/ClaimedDetails';
@@ -37,7 +38,7 @@ function App() {
           <Route path="/report-found" element={<ReportFound />} />
           
           {/* About Page */}
-          <Route path="/about" element={<Home />} />
+          <Route path="/about" element={<About />} />
 
           {/* Protected Admin Routes */}
           <Route path="/admin" element={
