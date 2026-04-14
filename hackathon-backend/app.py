@@ -7,7 +7,6 @@ import os
 import uuid
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
 from google import genai as google_genai
@@ -54,7 +53,6 @@ class User(db.Model):
     name = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
     role = db.Column(db.String(20), default='student') # student or admin
-    password_hash = db.Column(db.String(255), nullable=True)
 
     def to_dict(self):
         return {'id': self.id, 'name': self.name, 'email': self.email, 'role': self.role}
@@ -110,18 +108,10 @@ class FoundItem(db.Model):
         data['reporter_phone'] = self.reporter_phone
         return data
 
-# Admin credentials
-ADMIN_EMAIL = 'syedshahid0711@gmail.com'
-ADMIN_PASSWORD_HASH = generate_password_hash('itsshahid07')
-
+# Database setup and schema updates
 with app.app_context():
     db.create_all()
-    try:
-        db.session.execute(text('ALTER TABLE user ADD COLUMN password_hash VARCHAR(255)'))
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        
+    
     try:
         db.session.execute(text('ALTER TABLE found_item ADD COLUMN collector_name VARCHAR(100)'))
         db.session.execute(text('ALTER TABLE found_item ADD COLUMN collector_phone VARCHAR(50)'))
@@ -147,18 +137,16 @@ with app.app_context():
     except Exception:
         db.session.rollback()
 
-    # Ensure main admin user exists in the database
-    admin_user = User.query.filter_by(email=ADMIN_EMAIL).first()
-    if not admin_user:
-        admin_user = User(name='Main Admin', email=ADMIN_EMAIL, role='admin', password_hash=ADMIN_PASSWORD_HASH)
-        db.session.add(admin_user)
-        db.session.commit()
-    else:
-        admin_user.role = 'admin'
-        admin_user.password_hash = ADMIN_PASSWORD_HASH
-        db.session.commit()
-
 # --- API Routes ---
+
+# Define allowed domain and admins
+ALLOWED_DOMAIN = '@karnavatiuniversity.edu.in' # <-- Replace with your actual university domain!
+ADMIN_EMAILS = [
+    'ku2507u0198@karnavatiuniversity.edu.in', # Primary admin
+    # Add more admin emails here:
+    # 'john.doe@college.edu',
+    # 'admin@college.edu'
+]
 
 @app.route('/api/auth/google', methods=['POST'])
 def google_auth():
@@ -169,64 +157,31 @@ def google_auth():
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
         email = idinfo.get('email', '').lower()
 
-        if email != ADMIN_EMAIL:
-            return jsonify({'error': 'Unauthorized. Only the primary administrator can log in via Google.'}), 403
+        # Check if user is allowed to log in
+        is_admin = email in ADMIN_EMAILS
+        is_student = email.endswith(ALLOWED_DOMAIN)
+
+        if not (is_admin or is_student):
+            return jsonify({'error': f'Unauthorized. Only {ALLOWED_DOMAIN} emails or registered admins are permitted.'}), 403
         
         user = User.query.filter_by(email=email).first()
         if not user:
-            user = User(name=idinfo.get('name', 'Admin'), email=email, role='admin')
+            # Determine role based on which list/condition they matched
+            role = 'admin' if is_admin else 'student'
+            user = User(name=idinfo.get('name', 'User'), email=email, role=role)
             db.session.add(user)
             db.session.commit()
+        else:
+            # Ensure their role is up-to-date in case they were added to the admin list later
+            expected_role = 'admin' if is_admin else 'student'
+            if user.role != expected_role:
+                user.role = expected_role
+                db.session.commit()
 
         access_token = create_access_token(identity=str(user.id))
         return jsonify({'token': access_token, 'user': user.to_dict()}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
-@app.route('/api/auth/admin-login', methods=['POST'])
-def admin_login():
-    data = request.json
-    email = data.get('email', '').strip().lower()
-    password = data.get('password', '')
-
-    if email != ADMIN_EMAIL:
-        return jsonify({'error': 'Unauthorized. Only the primary administrator is permitted.'}), 403
-
-    user = User.query.filter_by(email=email).first()
-    if not user or user.role != 'admin' or not user.password_hash:
-        return jsonify({'error': 'Invalid credentials. Admin access only.'}), 401
-
-    if not check_password_hash(user.password_hash, password):
-        return jsonify({'error': 'Invalid credentials. Wrong password.'}), 401
-
-    access_token = create_access_token(identity=str(user.id))
-    return jsonify({'token': access_token, 'user': user.to_dict()}), 200
-
-@app.route('/api/auth/add-admin', methods=['POST'])
-@jwt_required()
-def add_admin():
-    admin_id = get_jwt_identity()
-    admin = User.query.get(int(admin_id))
-    if not admin or admin.role != 'admin':
-        return jsonify({'error': 'Unauthorized. Admins only.'}), 403
-
-    data = request.json
-    email = data.get('email', '').strip().lower()
-    password = data.get('password', '')
-    name = data.get('name', 'Admin')
-
-    if User.query.filter_by(email=email).first():
-        return jsonify({'error': 'User already exists.'}), 400
-
-    new_admin = User(
-        name=name,
-        email=email,
-        role='admin',
-        password_hash=generate_password_hash(password)
-    )
-    db.session.add(new_admin)
-    db.session.commit()
-    return jsonify({'message': 'Admin created successfully', 'user': new_admin.to_dict()}), 201
 
 @app.route('/api/items/lost', methods=['GET', 'POST'])
 @jwt_required(optional=True)

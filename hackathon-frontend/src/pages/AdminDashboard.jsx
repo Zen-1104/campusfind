@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getAdminDashboard, updateItemStatus, deleteItem } from '../api';
+import { getAdminDashboard, updateItemStatus, deleteItem, BACKEND_URL } from '../api';
 import './AdminDashboard.css';
-
-const BACKEND = 'http://localhost:8080';
 
 const STATUS_STEPS = ['submitted', 'verified', 'at_security', 'collected'];
 
@@ -126,7 +124,7 @@ export default function AdminDashboard() {
                   {item.photo_url && (
                     <div className="admin-item-photo-wrap">
                       <img
-                        src={`${BACKEND}${item.photo_url}`}
+                        src={`${BACKEND_URL}${item.photo_url}`}
                         alt={item.title}
                         className="admin-item-photo"
                         onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}

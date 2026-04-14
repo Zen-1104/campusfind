@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:8080/api';
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const BASE_URL = `${BACKEND_URL}/api`;
 
 // --- Auth ---
 export const loginGoogle = async (token) => {

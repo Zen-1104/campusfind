@@ -82,7 +82,8 @@ export default function ReportLost() {
       formData.append('photo', scanFile);
       if (scanDescription.trim()) formData.append('description', scanDescription.trim());
 
-      const res = await fetch('http://localhost:8080/api/scan_item', {
+      const { BACKEND_URL } = await import('../api');
+      const res = await fetch(`${BACKEND_URL}/api/scan_item`, {
         method: 'POST',
         body: formData
       });

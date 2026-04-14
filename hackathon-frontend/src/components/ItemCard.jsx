@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './ItemCard.css';
 
-const BACKEND = 'http://localhost:8080';
-
+import { BACKEND_URL } from '../api';
 export default function ItemCard({
   title,
   description,
@@ -41,7 +40,7 @@ export default function ItemCard({
               </div>
             ) : (
               <img
-                src={`${BACKEND}${photo_url}`}
+                src={`${BACKEND_URL}${photo_url}`}
                 alt={title}
                 className="card-photo"
                 onClick={() => setLightbox(true)}
@@ -86,7 +85,7 @@ export default function ItemCard({
       {/* Lightbox Overlay */}
       {lightbox && photo_url && (
         <div className="ic-lightbox" onClick={() => setLightbox(false)}>
-          <img src={`${BACKEND}${photo_url}`} alt={title} className="ic-lightbox-img" />
+          <img src={`${BACKEND_URL}${photo_url}`} alt={title} className="ic-lightbox-img" />
           <button
             className="ic-lightbox-close"
             onClick={(e) => { e.stopPropagation(); setLightbox(false); }}
