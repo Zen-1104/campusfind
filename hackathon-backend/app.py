@@ -11,10 +11,10 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import text
 from google import genai as google_genai
 from google.genai import types as genai_types
-
+ 
 # Initialize new Gemini client with short HTTP timeout to fail fast on quota errors
 gemini_client = google_genai.Client(
-    api_key=os.environ.get("GEMINI_API_KEY", ""),
+    api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyB0gopOQoBlcI18hj8sAd-fCtMeqx8M7MA"),
     http_options=genai_types.HttpOptions(timeout=8000)
 )
 
@@ -305,187 +305,59 @@ def scan_item():
     if not photo or photo.filename == '':
         return jsonify({'error': 'Empty file'}), 400
 
-    import re, io
-    from sqlalchemy import or_
-    from PIL import Image as PILImage
-
-    description_hint = request.form.get('description', '').strip()
+    import os
+    
     img_bytes = photo.read()
     ext       = (photo.filename.rsplit('.', 1)[-1].lower()) if photo.filename else 'jpg'
     mime_map  = {'jpg':'image/jpeg','jpeg':'image/jpeg','png':'image/png',
                  'gif':'image/gif','webp':'image/webp'}
     user_mime = mime_map.get(ext, 'image/jpeg')
 
-    used_ai       = False
-    scan_method   = 'color'
-    ai_description = ''
-    raw_keywords  = []
-
     # ═══════════════════════════════════════════════════════════════════════════
-    # PHASE 1 — Rich AI description of the uploaded image
-    # (10–15 descriptors: object type, colors, brand, material, unique features)
+    # DIRECT AI IMAGE MATCHING
+    # Fetch latest 20 items from Database that ACTUALLY have a photo
     # ═══════════════════════════════════════════════════════════════════════════
-    rich_prompt = (
-        "Analyze this image carefully and identify the main object.\n"
-        "Output ONLY a comma-separated list of 10 to 15 descriptive words/phrases that cover:\n"
-        "- The specific object type (e.g. wallet, headphones, phone, bottle, keychain, charger, id card)\n"
-        "- ALL colors visible (specific: 'navy blue', 'matte black', 'silver')\n"
-        "- Brand name or logo if visible (e.g. Sony, Apple, BMW, Samsung, Nike, Dell)\n"
-        "- Material (e.g. leather, plastic, metal, fabric, glass)\n"
-        "- Any unique features (e.g. cracked screen, stickers, wrist strap, USB-C)\n"
-        "Example output: headphones, black, Sony, over-ear, plastic, wireless, MDR series\n"
-        "ONLY output the comma-separated descriptors. Nothing else."
-    )
+    candidates = FoundItem.query.filter(FoundItem.photo_filename != None).order_by(FoundItem.created_at.desc()).limit(20).all()
+    UPLOAD_DIR = app.config['UPLOAD_FOLDER']
 
-    for model_name in ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest']:
-        try:
-            resp = gemini_client.models.generate_content(
-                model=model_name,
-                contents=[genai_types.Part.from_bytes(data=img_bytes, mime_type=user_mime), rich_prompt]
-            )
-            if resp and resp.text and len(resp.text.strip()) > 3:
-                ai_description = resp.text.replace('\n', '').strip()
-                clean = re.sub(r'[^\w\s,]', '', ai_description)
-                raw_keywords = [k.strip() for k in clean.split(',') if k.strip()]
-                used_ai     = True
-                scan_method = 'ai'
-                print(f"[AI-Phase1] {model_name}: {raw_keywords}")
-                break
-        except Exception as me:
-            print(f"[AI-Phase1] {model_name} failed: {str(me)[:80]}")
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # PHASE 2 — Fallback: Pillow color + description hint (if AI unavailable)
-    # ═══════════════════════════════════════════════════════════════════════════
-    if not raw_keywords:
-        try:
-            img = PILImage.open(io.BytesIO(img_bytes)).convert('RGB').resize((80, 80))
-            pix = list(img.getdata())
-            r = sum(p[0] for p in pix) // len(pix)
-            g = sum(p[1] for p in pix) // len(pix)
-            b = sum(p[2] for p in pix) // len(pix)
-            bri = (r + g + b) / 3
-            if   bri < 60:                  color = 'black'
-            elif bri > 200:                 color = 'white'
-            elif r > g and r > b and r > 160: color = 'red'
-            elif r > g and r > b:           color = 'brown'
-            elif g > r and g > b:           color = 'green'
-            elif b > r and b > g:           color = 'blue'
-            elif r > 150 and g > 150:       color = 'yellow'
-            elif r > 130 and g > 80 and b < 80: color = 'orange'
-            else:                           color = 'grey'
-            raw_keywords = [color]
-            print(f"[Color] dominant={color}")
-        except Exception as ce:
-            print(f"[Color] failed: {ce}")
-
-    # Blend in user-typed description hint
-    if description_hint:
-        hint_words = [w.strip() for w in re.split(r'[,\s]+', description_hint) if len(w.strip()) >= 2]
-        raw_keywords = list(set(raw_keywords + hint_words))
-        if not used_ai:
-            scan_method = 'description'
-
-    print(f"[Search] method={scan_method} | keywords={raw_keywords}")
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # PHASE 3 — Broad DB keyword search to get candidates for image comparison
-    # ═══════════════════════════════════════════════════════════════════════════
-    all_tokens = set()
-    for kw in raw_keywords:
-        kw = kw.strip()
-        if len(kw) >= 2:
-            all_tokens.add(kw.lower())
-        for w in re.split(r'\s+', kw):
-            w = w.strip()
-            if len(w) >= 2:
-                all_tokens.add(w.lower())
-            if len(w) >= 6:
-                all_tokens.add(w[:4].lower())
-                all_tokens.add(w[:5].lower())
-
-    conditions = []
-    for tok in all_tokens:
-        if len(tok) >= 2:
-            conditions.append(FoundItem.title.ilike(f'%{tok}%'))
-            conditions.append(FoundItem.description.ilike(f'%{tok}%'))
-            conditions.append(FoundItem.category.ilike(f'%{tok}%'))
-            conditions.append(FoundItem.location_found.ilike(f'%{tok}%'))
-
-    if conditions:
-        candidates = (FoundItem.query.filter(or_(*conditions))
-                      .order_by(FoundItem.created_at.desc()).limit(20).all())
-    else:
-        # No keywords at all — scan ALL items visually
-        candidates = FoundItem.query.order_by(FoundItem.created_at.desc()).limit(20).all()
-
-    # Deduplicate
-    seen_ids, candidates = set(), [c for c in candidates if not (c.id in seen_ids or seen_ids.add(c.id))]
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # PHASE 4 — Direct image-to-image visual comparison (Gemini) for each candidate
-    # This is the HIGH-ACCURACY step — replaces keyword guessing with visual matching
-    # ═══════════════════════════════════════════════════════════════════════════
-    scored_results = []
     items_with_score = []
-    items_without_photo = []
-
-    if used_ai:  # Only do image comparison when AI is working
-        UPLOAD_DIR = app.config['UPLOAD_FOLDER']
+    
+    try:
+        # Loop over candidates and perform direct Image-to-Image AI comparison
         for item in candidates:
-            if item.photo_filename:
-                photo_path = os.path.join(UPLOAD_DIR, item.photo_filename)
-                score = gemini_compare_images(img_bytes, photo_path, user_mime)
-                print(f"[Compare] '{item.title}' → score={score}")
-                if score >= 0:
-                    items_with_score.append((score, item))
-                else:
-                    items_without_photo.append(item)
-            else:
-                items_without_photo.append(item)
-
-        # Sort by similarity score, keep items ≥ 35 similarity
+            photo_path = os.path.join(UPLOAD_DIR, item.photo_filename)
+            score = gemini_compare_images(img_bytes, photo_path, user_mime)
+            print(f"[Direct AI Scan] '{item.title}' -> score={score}")
+            
+            # ONLY return items if AI strongly confirms they visually look like a match (70%+)
+            if score >= 70:
+                items_with_score.append((score, item))
+                
+        # Sort by similarity score descending (Best matches first)
         items_with_score.sort(key=lambda x: x[0], reverse=True)
-        matched_by_visual = [item for score, item in items_with_score if score >= 35]
-
-        # Blend: visually matched first, then keyword-only (no photo) items
-        final_matches = matched_by_visual + items_without_photo
-
-        # If visual comparison found strong matches, restrict to those only
-        strong_visual = [item for score, item in items_with_score if score >= 60]
-        if strong_visual:
-            final_matches = strong_visual + [item for score, item in items_with_score if 35 <= score < 60]
-
-        # Add similarity scores to response
+        final_matches = [item for score, item in items_with_score]
         score_map = {item.id: score for score, item in items_with_score}
-    else:
-        # No AI — just return keyword candidates as-is
-        final_matches = candidates
-        score_map = {}
 
-    # ── Final fallback: if nothing found at all, show everything ─────────────
-    show_all = False
-    if not final_matches:
-        final_matches = FoundItem.query.order_by(FoundItem.created_at.desc()).limit(15).all()
-        show_all = True
-        print("[Fallback] No matches — returning all items")
+        # Build response with similarity scores attached
+        matches_out = []
+        for item in final_matches[:12]:
+            d = item.to_dict()
+            d['similarity_score'] = score_map.get(item.id, 0)
+            matches_out.append(d)
 
-    # Build response with similarity scores attached
-    matches_out = []
-    for item in final_matches[:12]:
-        d = item.to_dict()
-        if item.id in score_map:
-            d['similarity_score'] = score_map[item.id]
-        matches_out.append(d)
+        return jsonify({
+            'keywords'         : [],
+            'ai_description'   : '',
+            'matches'          : matches_out,
+            'ai_used'          : True,
+            'scan_method'      : 'direct_ai',
+            'show_all_fallback': False
+        }), 200
 
-    return jsonify({
-        'keywords'         : raw_keywords,
-        'ai_description'   : ai_description,
-        'matches'          : matches_out,
-        'ai_used'          : used_ai,
-        'scan_method'      : scan_method,
-        'show_all_fallback': show_all
-    }), 200
+    except Exception as e:
+        print(f"[Direct AI Scan Error] {str(e)}")
+        # Note: If the Gemini API key crashes, it gracefully returns nothing rather than dumping all items
+        return jsonify({'error': 'Direct AI visual match failed', 'message': str(e)}), 500
 
 
 # Public image serving — anyone can view uploaded item photos

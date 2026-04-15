@@ -5,8 +5,8 @@ import ItemCard from '../components/ItemCard'; // To display matched found items
 import './Form.css';
 
 export default function ReportLost() {
-  const [activeTab, setActiveTab] = useState('form'); // 'form' or 'scan'
-  
+  const [activeTab, setActiveTab] = useState('form');
+
   // --- Form State ---
   const [formData, setFormData] = useState({
     title: '',
@@ -25,13 +25,13 @@ export default function ReportLost() {
   const [scanResults, setScanResults] = useState(null);
   const [extractedKeywords, setExtractedKeywords] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [scanDescription, setScanDescription] = useState('');
+    const [scanDescription, setScanDescription] = useState('');
   const [aiUsed, setAiUsed] = useState(false);
   const [scanError, setScanError] = useState('');
   const [showAllFallback, setShowAllFallback] = useState(false);
   const [aiDescription, setAiDescription] = useState('');
 
-  
+
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -77,10 +77,9 @@ export default function ReportLost() {
     setIsScanning(true);
     setScanError('');
     try {
-      // Send both photo AND optional description for fallback search
+      // Send photo to backend
       const formData = new FormData();
       formData.append('photo', scanFile);
-      if (scanDescription.trim()) formData.append('description', scanDescription.trim());
 
       const { BACKEND_URL } = await import('../api');
       const res = await fetch(`${BACKEND_URL}/api/scan_item`, {
@@ -99,7 +98,7 @@ export default function ReportLost() {
       if (result.message) setScanError(result.message);
 
     } catch (err) {
-      setScanError('Scan failed. Please add a description below and try again.');
+      setScanError('Scan failed. Please try uploading a different photo.');
       console.error(err);
     } finally {
       setIsScanning(false);
@@ -109,15 +108,15 @@ export default function ReportLost() {
   return (
     <div className="form-page-container">
       <div className="form-card" style={{ maxWidth: '800px', width: '100%' }}>
-        
+
         {/* Toggle Tabs */}
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '32px' }}>
-          <button 
+          <button
             onClick={() => setActiveTab('form')}
-            style={{ 
-              flex: 1, 
-              padding: '16px', 
-              background: 'transparent', 
+            style={{
+              flex: 1,
+              padding: '16px',
+              background: 'transparent',
               color: activeTab === 'form' ? '#2dd4bf' : '#64748b',
               border: 'none',
               borderBottom: activeTab === 'form' ? '2px solid #2dd4bf' : '2px solid transparent',
@@ -129,12 +128,12 @@ export default function ReportLost() {
           >
             ✍️ Report Manually
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('scan')}
-            style={{ 
-              flex: 1, 
-              padding: '16px', 
-              background: 'transparent', 
+            style={{
+              flex: 1,
+              padding: '16px',
+              background: 'transparent',
               color: activeTab === 'scan' ? '#6366f1' : '#64748b',
               border: 'none',
               borderBottom: activeTab === 'scan' ? '2px solid #6366f1' : '2px solid transparent',
@@ -160,20 +159,20 @@ export default function ReportLost() {
             <form onSubmit={handleFormSubmit} className="campus-form">
               <div className="input-group">
                 <label>What did you lose?</label>
-                <input type="text" placeholder="e.g., Blue Water Bottle" required 
-                  onChange={(e) => setFormData({...formData, title: e.target.value})} />
+                <input type="text" placeholder="e.g., Blue Water Bottle" required
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
               </div>
 
               <div className="input-group">
                 <label>Where did you last see it?</label>
-                <input type="text" placeholder="e.g., Block C, Room 202" required 
-                  onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                <input type="text" placeholder="e.g., Block C, Room 202" required
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
               </div>
 
               <div className="input-group">
                 <label>Date Lost</label>
-                <input type="date" required 
-                  onChange={(e) => setFormData({...formData, date_lost: e.target.value})} />
+                <input type="date" required
+                  onChange={(e) => setFormData({ ...formData, date_lost: e.target.value })} />
               </div>
 
               <div className="input-group">
@@ -187,14 +186,14 @@ export default function ReportLost() {
                   title="Please enter a valid 10-digit phone number"
                   inputMode="numeric"
                   onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
-                  onChange={(e) => setFormData({...formData, contact: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                 />
               </div>
 
               <div className="input-group">
                 <label>Description</label>
                 <textarea placeholder="Any specific stickers, scratches, or brand names?"
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}></textarea>
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
               </div>
 
               <button type="submit" className="submit-btn" disabled={isSubmitting}>
@@ -215,7 +214,7 @@ export default function ReportLost() {
               <p>Upload a photo of your lost item (or a similar reference image). Our AI will scan its visual details and search the Found gallery instantly!</p>
             </div>
 
-            <div 
+            <div
               className={`photo-upload-zone ${isDragging ? 'dragging' : ''}`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
@@ -238,33 +237,14 @@ export default function ReportLost() {
                 </div>
               )}
             </div>
-            <input 
-              type="file" 
-              accept="image/*" 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} 
-              onChange={(e) => handlePhotoChange(e.target.files[0])} 
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={(e) => handlePhotoChange(e.target.files[0])}
             />
 
-            {/* Description hint - visible after photo picked, always helps fallback */}
-            {scanFile && (
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.85rem', marginBottom: '8px' }}>
-                  📝 Describe the item <span style={{ color: '#475569' }}>(e.g. "blue BMW car") — helps if AI is busy</span>
-                </label>
-                <input
-                  type="text"
-                  value={scanDescription}
-                  onChange={e => setScanDescription(e.target.value)}
-                  placeholder="e.g. black headphones, red wallet, blue water bottle..."
-                  style={{
-                    width: '100%', padding: '12px 14px', borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#fff', fontSize: '0.9rem', boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-            )}
 
             {/* Error banner */}
             {scanError && (
@@ -308,12 +288,6 @@ export default function ReportLost() {
                   </div>
                 )}
 
-                {/* Fallback notice */}
-                {showAllFallback && (
-                  <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '10px', padding: '12px 16px', color: '#fcd34d', fontSize: '0.85rem', marginBottom: '20px' }}>
-                    💡 Tip: Add a description below (e.g. "black headphones") and scan again for precise results.
-                  </div>
-                )}
 
                 {/* Keyword chips */}
                 {extractedKeywords.length > 0 && !showAllFallback && (
@@ -344,16 +318,20 @@ export default function ReportLost() {
                           <ItemCard {...item} hideImage={true} />
                           {/* Similarity badge */}
                           {score !== undefined && (
-                            <div style={{ position: 'absolute', top: '12px', right: '12px',
+                            <div style={{
+                              position: 'absolute', top: '12px', right: '12px',
                               background: scoreColor, color: '#000',
                               padding: '4px 10px', borderRadius: '99px',
-                              fontSize: '0.75rem', fontWeight: 800 }}>
+                              fontSize: '0.75rem', fontWeight: 800
+                            }}>
                               {score}% Match
                             </div>
                           )}
                           <div style={{ position: 'absolute', bottom: '16px', right: '16px' }}>
-                            <span style={{ background: '#6366f1', color: '#fff', padding: '5px 10px',
-                              borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+                            <span style={{
+                              background: '#6366f1', color: '#fff', padding: '5px 10px',
+                              borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700
+                            }}>
                               View Details →
                             </span>
                           </div>
@@ -364,7 +342,7 @@ export default function ReportLost() {
 
                 ) : (
                   <div style={{ background: 'rgba(255,255,255,0.03)', padding: '30px', borderRadius: '12px', textAlign: 'center' }}>
-                    <p style={{ color: '#94a3b8', marginBottom: '16px' }}>Nothing matched. Try adding a description and scanning again.</p>
+                    <p style={{ color: '#94a3b8', marginBottom: '16px' }}>Nothing matched. Please try uploading another photo.</p>
                     <button className="cta-btn secondary" onClick={() => setActiveTab('form')} style={{ padding: '10px 24px' }}>Fill Manual Report</button>
                   </div>
                 )}
